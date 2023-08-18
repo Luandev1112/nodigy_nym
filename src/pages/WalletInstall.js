@@ -32,6 +32,12 @@ const WalletInstall = () => {
         setWalletAddress(value);
     } 
 
+    const handleStep = () => {
+        console.log("Wallet first : ", walletAddress[0]);
+        console.log("Wallet length:", walletAddress.length);
+        return false;
+    }
+
     useEffect(() => {
         // installnode();
     }, []);
@@ -66,10 +72,9 @@ const WalletInstall = () => {
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
-            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
+            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} handleStep={handleStep} />
         </div>
     )
 }

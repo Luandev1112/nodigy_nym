@@ -73,6 +73,10 @@ const ChooseServer = () => {
         setSelectedFlagIndex(idx);
     }
 
+    const handleStep = () => {
+        
+    }
+
     useEffect(() => {
         getAllServers();
     }, []);
