@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-const Footer = ({step, prevUrl, nextUrl}) => {
+const Footer = ({step, prevUrl, nextUrl, handleStep}) => {
     
     const navigate = useNavigate();
     
@@ -14,7 +14,13 @@ const Footer = ({step, prevUrl, nextUrl}) => {
     }
 
     const nextStep = () => {
-        navigate(nextUrl);
+        let status = true;
+        if(step == 6) {
+            status = handleStep();
+        }
+        if(status) {
+            navigate(nextUrl);
+        }
     }
 
     const gotoPage = () => {
