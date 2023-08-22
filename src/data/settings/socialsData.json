@@ -1,0 +1,45 @@
+[
+    {
+        "id": 1,
+        "image": "/assets/images/icon-twitter.png",
+        "name": "Twitter",
+        "socialId": "@super_investor#154",
+        "url": "#"
+    },
+    {
+        "id": 2,
+        "image": "/assets/images/icon-discord.png",
+        "name": "Discord",
+        "socialId": "@super_investor#154",
+        "url": "#"
+    },
+    {
+        "id": 3,
+        "image": "/assets/images/icon-telegram.png",
+        "name": "Telegram",
+        "socialId": "@super_investor#154",
+        "url": "#"
+    },
+    {
+        "id": 4,
+        "image": "/assets/images/icon-twitter.png",
+        "name": "Twitter",
+        "socialId": "@super_investor#154",
+        "url": "#"
+    },
+    {
+        "id": 5,
+        "image": "/assets/images/icon-discord.png",
+        "name": "Discord",
+        "socialId": "@super_investor#154",
+        "url": "#"
+    },
+    {
+        "id": 6,
+        "image": "/assets/images/icon-telegram.png",
+        "name": "Telegram",
+        "socialId": "@super_investor#154",
+        "url": "#"
+    }
+
+]

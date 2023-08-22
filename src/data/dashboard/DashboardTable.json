@@ -1,0 +1,38 @@
+[
+    {
+        "nodeId": "AAA123456",
+        "token": "Forta",
+        "nodeName": "Node Name123456",
+        "ownStake": "+$300.00",
+        "clientsStake": "+$300.00",
+        "APY": "+$300.00",
+        "Earned": "+$300.00"
+    },
+    {
+        "nodeId": "AAA123456",
+        "token": "Forta",
+        "nodeName": "Node Name123456",
+        "ownStake": "+$300.00",
+        "clientsStake": "+$300.00",
+        "APY": "+$300.00",
+        "Earned": "+$300.00"
+    },
+    {
+        "nodeId": "AAA123456",
+        "token": "Forta",
+        "nodeName": "Node Name123456",
+        "ownStake": "+$300.00",
+        "clientsStake": "+$300.00",
+        "APY": "+$300.00",
+        "Earned": "+$300.00"
+    },
+    {
+        "nodeId": "AAA123456",
+        "token": "Forta",
+        "nodeName": "Node Name123456",
+        "ownStake": "+$300.00",
+        "clientsStake": "+$300.00",
+        "APY": "+$300.00",
+        "Earned": "+$300.00"
+    }
+]

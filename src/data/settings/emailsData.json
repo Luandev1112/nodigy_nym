@@ -1,0 +1,19 @@
+[
+    {
+        "id": 1,
+        "image": "/assets/images/icon-email-shape.svg",
+        "name": "Козлова Елизавета Михайловна",
+        "email": "Bisuper.investor@gmail.comt",
+        "status": "Verified",
+        "statusClass": "verified"
+    },
+
+    {
+        "id": 2,
+        "image": "/assets/images/icon-email-shape.svg",
+        "name": "Козлова Елизавета Михайловна",
+        "email": "Bisauper.investor@gmail.com",
+        "status": "Pending",
+        "statusClass": "pending"
+    }
+]

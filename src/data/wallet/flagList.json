@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "name": "United State",
+        "slug": "us"
+    },
+    {
+        "id": 2,
+        "name": "France",
+        "slug": "fr"
+    },
+    {
+        "id": 3,
+        "name": "Germany",
+        "slug": "de"
+    }
+]

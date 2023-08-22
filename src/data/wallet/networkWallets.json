@@ -1,0 +1,84 @@
+[
+    {
+        "networkId": 1,
+        "wallets": [
+            {
+                "id" : 1,
+                "name" : "MetaMask",
+                "image" : "/assets/images/logo-icon 1.png"
+            }
+        ]
+        
+    },
+    {
+        "networkId": 2,
+        "wallets": [
+            {
+                "id" : 2,
+                "name" : "Atomic",
+                "image" : "/assets/images/logo-icon 1.png"
+            },
+            {
+                "id" : 3,
+                "name" : "Phantom",
+                "image" : "/assets/images/logo-icon 1.png"
+            },
+            {
+                "id" : 4,
+                "name" : "Exodus",
+                "image" : "/assets/images/logo-icon 1.png"
+            }
+        ]
+    },
+    {
+        "networkId": 3,
+        "wallets": [
+            {
+                "id" : 5,
+                "name" : "Station",
+                "image" : "/assets/images/logo-icon 1.png"
+            }
+        ]
+    },
+    {
+        "networkId": 4,
+        "wallets": [
+            {
+                "id" : 6,
+                "name" : "Cosmos Station",
+                "image" : "/assets/images/logo-icon 1.png"
+            },
+            {
+                "id" : 7,
+                "name" : "Keplr",
+                "image" : "/assets/images/logo-icon 1.png"
+            }
+        ]
+    },
+    {
+        "networkId": 5,
+        "wallets": [
+            {
+                "id" : 8,
+                "name" : "Daedalus",
+                "image" : "/assets/images/logo-icon 1.png"
+            },
+            {
+                "id" : 9,
+                "name" : "Yoroi",
+                "image" : "/assets/images/logo-icon 1.png"
+            }
+        ]
+    },
+    {
+        "networkId": 6,
+        "wallets": [
+            {
+                "id" : 10,
+                "name" : "Braavos",
+                "image" : "/assets/images/logo-icon 1.png"
+            }
+        ]
+    }
+   
+]

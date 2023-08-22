@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "name": "EVM",
+        "image": "/assets/images/networks-img1.png",
+        "counts": 3,
+        "description": " Suspendisse feugiat dignissim tellus"
+    },
+    {
+        "id": 2,
+        "name": "Solana",
+        "image": "/assets/images/networks-img2.png",
+        "counts": 1,
+        "description": " Suspendisse feugiat dignissim tellus"
+    },
+    {
+        "id": 3,
+        "name": "Terra",
+        "image": "/assets/images/networks-img1.png",
+        "counts": 0,
+        "description": " Suspendisse feugiat dignissim tellus"
+    },
+    {
+        "id": 4,
+        "name": "Cosmos",
+        "image": "/assets/images/networks-img1.png",
+        "counts": 5,
+        "description": " Suspendisse feugiat dignissim tellus"
+    },
+    {
+        "id": 5,
+        "name": "Cardarno",
+        "image": "/assets/images/networks-img1.png",
+        "counts": 4,
+        "description": " Suspendisse feugiat dignissim tellus"
+    },
+    {
+        "id": 6,
+        "name": "StarkNet",
+        "image": "/assets/images/networks-img1.png",
+        "counts": 4,
+        "description": " Suspendisse feugiat dignissim tellus"
+    }
+]

@@ -1,0 +1,5 @@
+build/*.js
+config/*.js
+src/pages/*.js
+src/common/*.js
+src/*.js

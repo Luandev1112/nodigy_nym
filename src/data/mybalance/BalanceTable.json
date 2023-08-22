@@ -1,0 +1,38 @@
+[
+    {
+        "date": "10.01.2023",
+        "amount": "212.564",
+        "paymentType": "Monthly Service Fee",
+        "projectName": "Name Project & Logo",
+        "status": "Invoice",
+        "statusCalss" : "invoicetext",
+        "walletAddress": "5uzgAJuCN...fC4f4h"
+    },
+    {
+        "date": "10.01.2023",
+        "amount": "212.564",
+        "paymentType": "Monthly Service Fee",
+        "projectName": "Name Project & Logo",
+        "status": "Pending",
+        "statusCalss" : "pendingtext",
+        "walletAddress": "5uzgAJuCN...fC4f4h"
+    },
+    {
+        "date": "10.01.2023",
+        "amount": "212.564",
+        "paymentType": "Monthly Service Fee",
+        "projectName": "Name Project & Logo",
+        "status": "Failed",
+        "statusCalss" : "failedtext",
+        "walletAddress": "5uzgAJuCN...fC4f4h"
+    },
+    {
+        "date": "10.01.2023",
+        "amount": "212.564",
+        "paymentType": "Monthly Service Fee",
+        "projectName": "Name Project & Logo",
+        "status": "Success",
+        "statusCalss" : "successtext",
+        "walletAddress": "5uzgAJuCN...fC4f4h"
+    }
+]

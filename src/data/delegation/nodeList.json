@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "name": "Node 1",
+        "image": "/assets/images/delegation-details-listicon.png",
+        "address": "5uzgAJuCN...fC4f4h",
+        "url" : "www.aaavalidator.com",
+        "status" : "Installation",
+        "statusClass": "installation"
+    },
+    {
+        "id": 2,
+        "name": "Node 2",
+        "image": "/assets/images/node1-img.png",
+        "address": "5uzgAJuCN...fC4f4h",
+        "url" : "www.aaavalidator.com",
+        "status" : "Active",
+        "statusClass": "active"
+    },
+    {
+        "id": 3,
+        "name": "Node 3",
+        "image": "/assets/images/node1-img.png",
+        "address": "5uzgAJuCN...fC4f4h",
+        "url" : "www.aaavalidator.com",
+        "status" : "Success",
+        "statusClass": "success"
+    },
+    {
+        "id": 4,
+        "name": "Node 4",
+        "image": "/assets/images/delegation-details-listicon.png",
+        "address": "5uzgAJuCN...fC4f4h",
+        "url" : "www.aaavalidator.com",
+        "status" : "Installation",
+        "statusClass": "installation"
+    },
+    {
+        "id": 5,
+        "name": "Node 5",
+        "image": "/assets/images/node1-img.png",
+        "address": "5uzgAJuCN...fC4f4h",
+        "url" : "www.aaavalidator.com",
+        "status" : "Active",
+        "statusClass": "active"
+    },
+    {
+        "id": 6,
+        "name": "Node 6",
+        "image": "/assets/images/node1-img.png",
+        "address": "5uzgAJuCN...fC4f4h",
+        "url" : "www.aaavalidator.com",
+        "status" : "Success",
+        "statusClass": "success"
+    }
+]
