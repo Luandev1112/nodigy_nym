@@ -13,9 +13,9 @@ axios.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 axios.interceptors.response.use(
   response => response,
   (error) => {
-    if (error.response.status === 401) {
+    // if (error.response.status === 401) {
       
-    }
+    // }
     return Promise.reject(error);
   });
 

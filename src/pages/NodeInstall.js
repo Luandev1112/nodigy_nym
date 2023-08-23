@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import Http from "../utils/Http";
 import InstallationImage from "../assets/images/node-installation-process-icon.png";
 import NodeImage from "../assets/images/nodes-logo-icon1.png";
@@ -6,37 +7,35 @@ import EditImage from "../assets/images/icon-edit-2.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
-const NodeInstall = ({setStep, setSubStep, server, project, wallet, chain}) => {
-    console.log("final project>>>>>", project);
-    const [node, selectedNode] = useState(null);
-    const [walletAddress, setWalletAddress] = useState("nymt17q9pn5rh8h8mxhmfv04wn4670f2kpxrwn0qh6q");
+const NodeInstall = () => {
+    const [walletAddress, setWalletAddress] = useState("");
     const [balance, setBalance] = useState(0);
-    const installnode = async() => {
+
+    const navigate = useNavigate()
+    const apiUrl = "http://localhost";
+
+    const getWalletAddress = async() => {
         const formData = new FormData();
-        formData.append('project_id', project.id);
-        formData.append('server_id', server.id);
-        formData.append('user_wallet_id', wallet.user_wallet_id);
-        formData.append('node_name', wallet.network_name + " Node");
-        formData.append('node_logo', project.image);
-        formData.append('node_type', project.network_type);
-        // formData.append('min_stake', project.min_stake);
-        // formData.append('min_price', project.min_price);
-        const res = await Http.post('/admin/api/createNode', formData);
-        console.log(res);
-        if(res.data.result == 1) {
-            setTimeout(() => {
-                setStep(7);
-                setSubStep('node-install-success');
-            }, 1000);
-        }
+        formData.append('project_name', 'NYM');
+        const res = await Http.post(apiUrl + "/api/getNodeWallet", formData);
+        const _walletAddress = res.data.wallet;
+        setWalletAddress(_walletAddress);
     }
 
     const shortenAddress = (address) => {
-        let newString = address.substr(0 , 5) + "..." + address.substr(-5, 5);
+        let newString = '';
+        if(address.length <= 10){
+            newString = address;
+        }else{
+            newString = address.substr(0 , 5) + "..." + address.substr(-5, 5);
+        }
         return newString;
     }
     useEffect(() => {
-        
+        getWalletAddress();
+        setTimeout(() => {
+            navigate('/bond-wallet')
+        }, 10000);
     }, []);
     return (
         <div className="steps">

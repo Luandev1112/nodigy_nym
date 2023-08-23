@@ -6643,3 +6643,15 @@ a {
 	color: #fff;
 	padding: 16px;
 }
+
+.font-danger {
+	color: #ED4F9D !important;
+}
+
+.border-danger {
+	border-color: #ED4F9D;
+}
+
+.background-danger {
+	background-color: #5C0505;
+}

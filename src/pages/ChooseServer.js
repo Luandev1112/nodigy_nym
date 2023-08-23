@@ -27,6 +27,12 @@ const ChooseServer = () => {
     const baseURL = "http://localhost";
     const navigate = useNavigate();
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const _token = urlParams.get('token');
+    if(_token != null) {
+        localStorage.setItem('access_token', _token);
+    }
+
     const selectServer = (idx) => {
         const _selectedServer = servers[idx];
         setSelectedServer(_selectedServer);

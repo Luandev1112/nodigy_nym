@@ -13,6 +13,7 @@ const WalletInstall = () => {
     const [node, selectedNode] = useState(null);
     const [walletAddress, setWalletAddress] = useState('');
     const [balance, setBalance] = useState(0);
+    const [walletStatus, setWalletStatus] = useState(true);
     const [step, setStep] = useState(6);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('/wallet-installation-success');
@@ -32,10 +33,22 @@ const WalletInstall = () => {
         setWalletAddress(value);
     } 
 
-    const handleStep = () => {
-        console.log("Wallet first : ", walletAddress[0]);
-        console.log("Wallet length:", walletAddress.length);
-        return false;
+    const handleStep = async() => {
+        let _walletStatus = false;
+        if(walletAddress.length == 40 && walletAddress.slice(0,2) == 'n1')
+        {
+            const formData = new FormData();
+            formData.append('wallet_address', walletAddress);
+            formData.append('project_name', 'NYM');
+            const result = await Http.post(baseURL+'/api/addWallet', formData);
+            console.log("result : ", result);
+            _walletStatus = true;
+            setWalletStatus(true);
+        }else{
+            _walletStatus = false;
+            setWalletStatus(false);
+        }
+        return _walletStatus;
     }
 
     useEffect(() => {
@@ -57,16 +70,16 @@ const WalletInstall = () => {
                                         <p className="graytext">If the connection fails, enter your wallet address in the field below. Make sure to enter it correctly!</p>
                                         
                                         <div className="title">
-                                            <span className="install-title">NYM Wallet</span>
+                                            <span className={walletStatus?"install-title":"install-title font-danger"} >NYM Wallet</span>
                                             <a className="install-button" role="button">Install wallet <img src={ArrowRightImage} /></a>
                                         </div>
                                         <div className="n_r_form_field">
                                             <div className="form-group">
                                                 <img src={NodeImage} />
-                                                <input type="text" className="form-control" name="wallet_address" value={walletAddress} onChange={handleChange} />
+                                                <input type="text" className={walletStatus?"form-control":"form-control border-danger"} name="wallet_address" value={walletAddress} onChange={handleChange} />
                                             </div>
                                         </div> 
-                                        <div className="insufficientbalance">Please make sure that your wallet has a balance at least 101 NYM tokens - a minimum, required for node installation</div>
+                                        <div className={walletStatus?"insufficientbalance":"insufficientbalance background-danger"}>Please make sure that your wallet has a balance at least 101 NYM tokens - a minimum, required for node installation</div>
                                     </div>
                                 </div>
                             </div>

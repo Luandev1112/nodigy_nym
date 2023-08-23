@@ -12,6 +12,10 @@ import ProgressBar from '../common/ProgressBar';
 
 const StakeSuccess = () => {
     const [balance, setBalance] = useState(0);
+    const [step, setStep] = useState(8);
+    const [subStep, setSubStep] = useState(0);
+    const [nextUrl, setNextUrl] = useState('');
+    const [prevUrl, setPrevUrl] = useState(''); 
     useEffect(() => {
        console.log("useEffect");
     });
@@ -55,7 +59,7 @@ const StakeSuccess = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
         </div>
     )
 }
