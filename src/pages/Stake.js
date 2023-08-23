@@ -8,6 +8,13 @@ import EmptyWalletImage from '../assets/images/icon-empty-wallet.svg';
 import RefreshImage from '../assets/images/icon-refresh-circle-white.svg';
 const Stake = () => {
     const [balance, setBalance] = useState(0);
+    const [test, setTest] = useState(false);
+
+    const [step, setStep] = useState(8);
+    const [subStep, setSubStep] = useState(0);
+    const [nextUrl, setNextUrl] = useState('/stake-success');
+    const [prevUrl, setPrevUrl] = useState('/node-installation-success'); 
+
     useEffect(() => {
        console.log("useEffect");
     });
@@ -47,24 +54,28 @@ const Stake = () => {
                                         <p> You can increase the amount tokens in your node by <a href="#">#bonding</a> more tokens or <a href="#">#delegating</a> into your node right in your wallet.
                                             Increase the amount of tokens to earn more via validating.
                                             Remember: your tokens will appear in your node in the next epoch (~ 1 hour).</p>
-                                        <div className="nodeyourballance item border-left">
-                                            <div className="icon"><img src={EmptyWalletImage} /></div>
-                                            <div className="text">
-                                                <p><span>Your balance is 12.43 $NYM</span> Too low to stake</p>
-                                            </div>
-                                            <div className="action"><a href="#"><img src={RefreshImage} /></a></div>
-                                        </div>
-                                        <div className="n_r_form_field">
-                                            <p>85 485.56 $NYM <span>MAX</span></p>
-                                            <div className="form-group">
-                                                <span>$NYM</span>
-                                                <input type="text" className="form-control" value="10" />
-                                            </div>
-                                        </div>
-                                        <div className="btn-container">
-                                            <a href="#" className="btn btn-primary btn-buytoken">Buy tokens with fiat</a>
-                                            <a href="#" className="btn btn-primary btn-buytoken">Buy tokens with crypto</a>
-                                        </div>
+                                        {test && 
+                                            <React.Fragment>
+                                                <div className="nodeyourballance item border-left">
+                                                    <div className="icon"><img src={EmptyWalletImage} /></div>
+                                                    <div className="text">
+                                                        <p><span>Your balance is 12.43 $NYM</span> Too low to stake</p>
+                                                    </div>
+                                                    <div className="action"><a href="#"><img src={RefreshImage} /></a></div>
+                                                </div>
+                                                <div className="n_r_form_field">
+                                                    <p>85 485.56 $NYM <span>MAX</span></p>
+                                                    <div className="form-group">
+                                                        <span>$NYM</span>
+                                                        <input type="text" className="form-control" value="10" />
+                                                    </div>
+                                                </div>
+                                                <div className="btn-container">
+                                                    <a href="#" className="btn btn-primary btn-buytoken">Buy tokens with fiat</a>
+                                                    <a href="#" className="btn btn-primary btn-buytoken">Buy tokens with crypto</a>
+                                                </div>
+                                            </React.Fragment>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -72,7 +83,7 @@ const Stake = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
         </div>
     )
 }

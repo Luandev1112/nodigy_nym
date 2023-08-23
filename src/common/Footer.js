@@ -41,7 +41,9 @@ const Footer = ({step, prevUrl, nextUrl, handleStep}) => {
                         {
                             prevUrl &&  <a onClick={()=>prevStep()} className={prevUrl==''?"btn btn-primary":"btn btn-primary"}>Previous</a>
                         }
+                        {step > 0 &&
                             <span>Step {step} of 8</span>
+                        }
                         {
                             nextUrl &&  <a onClick={()=>nextStep()} className={nextUrl==''?"btn btn-primary":"btn btn-primary active"}>Next</a>
                         }

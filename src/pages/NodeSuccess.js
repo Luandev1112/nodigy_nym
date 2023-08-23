@@ -1,9 +1,21 @@
 import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import InstallImage from '../assets/images/icon-installation.png';
 import NYMImage from '../assets/images/nodes-logo-icon1.png';
 import EditImage from '../assets/images/icon-edit-2.svg';
 import CopyImage from '../assets/images/icon-copy.svg';
+import Footer from '../common/Footer';
 const NodeSuccess = () => {
+
+    const [step, setStep] = useState(7);
+    const [subStep, setSubStep] = useState(0);
+    const [nextUrl, setNextUrl] = useState('');
+    const [prevUrl, setPrevUrl] = useState(''); 
+
+    const navigate = useNavigate();
+    const gotoNextPage = () => {
+        navigate('/stake');
+    }
     useEffect(() => {
        console.log("useEffect");
     });
@@ -63,15 +75,15 @@ const NodeSuccess = () => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div className="btn-container"><a href="node-requirement1.html" className="btn btn-primary width100">Stake tokens to my node</a></div>
+                                        <div className="btn-container"><a onClick={gotoNextPage} className="btn btn-primary width100">Stake tokens to my node</a></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
+            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
         </div>
     )
 }

@@ -19,6 +19,20 @@ const ChooseServer = () => {
     const [mixPort, setMixPort] = useState(8080);
     const [verlocPort, setVerlocPort] = useState(8090);
     const [httpPort, setHttpPort] = useState(5000);
+    const [signatureWallet, setSignatureWallet] = useState('');
+    const [step1, setStep1] = useState(false);
+    const [step2, setStep2] = useState(false);
+    const [step3, setStep3] = useState(false);
+    const [step4, setStep4] = useState(false);
+    const [step5, setStep5] = useState(false);
+    const [messageText, setMessageText] = useState('');
+    const [messageClass, setMessageClass] = useState('btn-gray');
+    const [finishClass, setFinishClass] = useState('btn-gray');
+
+    const [step, setStep] = useState(5);
+    const [subStep, setSubStep] = useState(0);
+    const [nextUrl, setNextUrl] = useState('');
+    const [prevUrl, setPrevUrl] = useState('/wallet-install'); 
 
     const shortenAddressString = (address, length) => {
         let newString = '';
@@ -38,8 +52,46 @@ const ChooseServer = () => {
         setServers(_servers.data);
     }
 
-    const handleChange = () => {
+    const handleChange = (e) => {
+        // e.preventDefault();
+        const name = e.target.name;
+        switch(name){
+            case 'step1':
+                setStep1(true);    
+            break;
+            case 'step2':
+                setStep2(true);    
+            break;
+            case 'step3':
+                setStep3(true);    
+            break;
+            case 'step4':
+                setStep4(true);    
+            break;
+            case 'step5':
+                // setStep5(true);    
+            break;
+            case 'message':
+                const _value = e.target.value;
+                setMessageText(_value);
+                if(_value.length > 0) {
+                    setMessageClass('');
+                }
+            break;
+        }
+    }
 
+    const messageSubmit = () => {
+        if(messageText.length > 0)
+        {
+            setSignatureWallet(walletAddress);
+            setStep5(true);
+            setFinishClass('');
+        }
+    }
+
+    const gotoNextPage = () => {
+        navigate('/node-installation-success');
     }
 
     useEffect(() => {
@@ -67,35 +119,35 @@ const ChooseServer = () => {
 
                                     <div className="bond-step mt-4">
                                         <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value="" id="bond-step-1" />
+                                            <input className="form-check-input" type="checkbox" name="step1" checked={step1} onChange={handleChange} id="bond-step-1" />
                                             <label className="form-check-label" htmlFor="bond-step-1">
                                                 1. Open your wallet and sign in. Use wallet address you connected to your node.
                                             </label>
                                         </div>
 
                                         <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value="" id="bond-step-2" />
+                                            <input className="form-check-input" type="checkbox" name="step2" checked={step2} onChange={handleChange} id="bond-step-2" />
                                             <label className="form-check-label" htmlFor="bond-step-2">
                                                 2. Navigate to Bonding --> Bond in your wallet and select Mixnode type.
                                             </label>
                                         </div>
 
                                         <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value="" id="bond-step-3" />
+                                            <input className="form-check-input" type="checkbox" name="step3" checked={step3} onChange={handleChange} id="bond-step-3" />
                                             <label className="form-check-label" htmlFor="bond-step-3">
                                                 3. Click “Show advanced options” in the popup in your wallet and copy data from the list above this text and paste into related fields in your wallet and click NEXT.
                                             </label>
                                         </div>
 
                                         <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value="" id="bond-step-4" />
+                                            <input className="form-check-input" type="checkbox" name="step4" checked={step4} onChange={handleChange} id="bond-step-4" />
                                             <label className="form-check-label" htmlFor="bond-step-4">
                                                 4. Copy message you received in your wallet and paste it in the field below:
                                             </label>
                                         </div>
 
                                         <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value="" id="bond-step-5" />
+                                            <input className="form-check-input" type="checkbox" name="step5" checked={step5} onChange={handleChange} id="bond-step-5" />
                                             <label className="form-check-label" htmlFor="bond-step-5">
                                                 5. Copy the signature and paste it in the related field in your wallet.
                                             </label>
@@ -152,12 +204,28 @@ const ChooseServer = () => {
                                         <div className="mt-4 message-group">
                                             <h4>4. Copy message you received in your wallet and paste it in the field below:</h4>
                                             <div className="form-group mb-2">
-                                                <textarea className="wallet-message"></textarea>
+                                                <textarea className="wallet-message" name="message" onChange={handleChange}>{messageText}</textarea>
                                             </div>
-                                            <a href="node-requirement1.html" className="btn btn-primary py-2">Submit</a>
+                                            <a onClick={messageSubmit} className={"btn btn-primary py-2 "+messageClass}>Submit</a>
                                         </div>
 
-                                        <div className="btn-container"><a href="node-requirement1.html" className="btn btn-primary btn-gray width100">Finish node installation</a></div>
+                                        <div className="mt-4 signature-group">
+                                            <h4>5. Copy signature and paste in in the related field in your wallet:</h4>
+                                            <table className="table table-striped">
+                                                <tbody>
+                                                    <tr>
+                                                        <td className="td-name">Signature:</td>
+                                                        <td className="text-end"><span>{shortenAddressString(signatureWallet, 26)}</span>
+                                                        {
+                                                            shortenAddressString(signatureWallet, 26) != '' && <a href="#"> <img src={CopyImage} /></a>
+                                                        }
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div className="btn-container"><a onClick={gotoNextPage} className={"btn btn-primary width100 "+finishClass}>Finish node installation</a></div>
                                     </div>  
                                 </div>
                             </div>
@@ -165,7 +233,7 @@ const ChooseServer = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
         </div>
     )
 }

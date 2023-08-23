@@ -7,31 +7,19 @@ import ProgressBar from '../common/ProgressBar';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
 import CopyImage from '../assets/images/icon-copy.svg';
 const WalletSuccess = () => {
-    const { state } = useLocation();
-    const [hashId, setHashId] = useState(state?state.hashId:null);
-    const [balanceType, setBalanceType] = useState(state?state.balanceType:null);
     const [balance, setBalance] = useState(0);
     const [amount, setAmount] = useState(0);
-    const baseURL = 'http://localhost';
+    const [step, setStep] = useState(0);
+    const [subStep, setSubStep] = useState(0);
+    const [nextUrl, setNextUrl] = useState('');
+    const [prevUrl, setPrevUrl] = useState(''); 
     const navigate = useNavigate();
 
     const gotoNextStep = () => {
-        switch(balanceType) {
-            case 'server':
-                navigate('/wallet-install');
-            break;
-            case 'node-install':
-                
-            break;
-        }
+        navigate('/node-install');
     }
-    const getTransaction = async() => {
-        const res = await Http.get(baseURL+'/api/getTransaction/'+hashId);
-        setAmount(res.data.amount);
-    }
-
     useEffect(()=>{
-        getTransaction();
+        
     }, []); 
     return (
         <div className="steps">
@@ -60,7 +48,7 @@ const WalletSuccess = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
         </div>
     )
 }
