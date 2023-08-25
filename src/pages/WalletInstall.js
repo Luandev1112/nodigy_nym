@@ -17,7 +17,7 @@ const WalletInstall = () => {
     const [step, setStep] = useState(6);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('/wallet-installation-success');
-    const [prevUrl, setPrevUrl] = useState('/'); 
+    const [prevUrl, setPrevUrl] = useState('/choose-server'); 
 
     const baseURL = 'http://localhost';
     const shortenAddress = (address) => {
@@ -29,18 +29,17 @@ const WalletInstall = () => {
         e.preventDefault();
         const name = e.target.name;
         const value = e.target.value;
-        console.log(value);
         setWalletAddress(value);
     } 
 
-    const handleStep = async() => {
+    const handleStep = () => {
         let _walletStatus = false;
         if(walletAddress.length == 40 && walletAddress.slice(0,2) == 'n1')
         {
             const formData = new FormData();
             formData.append('wallet_address', walletAddress);
             formData.append('project_name', 'NYM');
-            const result = await Http.post(baseURL+'/api/addWallet', formData);
+            const result = Http.post(baseURL+'/api/addWallet', formData);
             console.log("result : ", result);
             _walletStatus = true;
             setWalletStatus(true);

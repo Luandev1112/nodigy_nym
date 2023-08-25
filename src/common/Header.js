@@ -29,7 +29,7 @@ const Header = ({setBalance, myBalance}) => {
         }
       }catch(err){
         console.log("error:::", err);
-        window.location.href = baseURL;
+        window.location.href = baseURL+"/admin/wallet-connect";
       }
     }
 

@@ -17,6 +17,7 @@ const Footer = ({step, prevUrl, nextUrl, handleStep}) => {
         let status = true;
         if(step == 6) {
             status = handleStep();
+            console.log("Handle step status", status);
         }
         if(status) {
             navigate(nextUrl);

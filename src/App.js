@@ -13,6 +13,7 @@ import Stake from './pages/Stake';
 import StakeSuccess from './pages/StakeSuccess';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import First from './pages/First';
 const App = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [url, setUrl] = useState('');
@@ -40,7 +41,8 @@ const App = () => {
     return (
         <Router>
              <Routes>
-                <Route path="/"  element={<ChooseServer />} />
+                <Route path="/"  element={<First />} />
+                <Route path="/choose-server"  element={<ChooseServer />} />
                 <Route path='/top-up-account' element={<TopupAccount />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/register' element={<Register />} />
