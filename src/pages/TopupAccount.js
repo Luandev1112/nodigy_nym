@@ -32,7 +32,7 @@ const TopupAccount = () => {
   const [step, setStep] = useState(4);
   const [subStep, setSubStep] = useState(0);
   const [nextUrl, setNextUrl] = useState('');
-  const [prevUrl, setPrevUrl] = useState('/'); 
+  const [prevUrl, setPrevUrl] = useState('/choose-server'); 
 
   // TronLink transaction constant settings
   // const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";

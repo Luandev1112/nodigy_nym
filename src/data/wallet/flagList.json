@@ -1,17 +1,14 @@
-[
-    {
-        "id": 1,
-        "name": "United State",
-        "slug": "us"
+{
+    "DE": {
+        "country" : "Germany",
+        "flag": "de.svg"
     },
-    {
-        "id": 2,
-        "name": "France",
-        "slug": "fr"
+    "FI": {
+        "country": "Finland",
+        "flag": "fi.svg"
     },
-    {
-        "id": 3,
-        "name": "Germany",
-        "slug": "de"
+    "US": {
+        "country" : "United States",
+        "flag": "us.svg"
     }
-]
+}

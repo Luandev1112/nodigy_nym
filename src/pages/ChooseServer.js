@@ -17,29 +17,47 @@ const ChooseServer = () => {
     const [monthlyPrice, setMonthlyPrice] = useState(0);
     const [dataCenters, setDataCenter] = useState(['Hartznerf']);
     const [selectedDataCenter, setSelectedDataCenter] = useState(0);
-    const [selectedFlagIndex, setSelectedFlagIndex] = useState(-1);
+    const [selectedLocationIndex, setSelectedLocationIndex] = useState(-1);
     const [balance, setBalance] = useState(0);
     const [step, setStep] = useState(3);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
     const [prevUrl, setPrevUrl] = useState('http://localhost/admin/wallet-connect'); 
+    const [exchangeRate, setExchangeRate] = useState(1);
+    const [serverLocations, setServerLocations] = useState([]);
+    const [selectedLocations, setSelectedLocations] = useState([]);
 
     const baseURL = "http://localhost";
     const navigate = useNavigate();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const _token = urlParams.get('token');
-    if(_token != null) {
-        localStorage.setItem('access_token', _token);
-    }
 
     const selectServer = (idx) => {
         const _selectedServer = servers[idx];
         setSelectedServer(_selectedServer);
         setSelectedId(_selectedServer.id);
-        setMonthlyPrice(_selectedServer.monthly_price);
-        const _limitBalance = onbordingFee*1 + _selectedServer.monthly_price*1;
-        setLimitBalance(_limitBalance);
+        const _priceList = _selectedServer.prices;
+        if(_priceList.length > 0){
+            const _price = Number((_priceList[0].price_monthly.gross * exchangeRate).toFixed(2));
+            setMonthlyPrice(_price);
+            const _limitBalance = onbordingFee*1 + _price;
+            setLimitBalance(_limitBalance);
+
+            let _serverLocations = [];
+            for(let i = 0; i < _priceList.length; i++)
+            {
+                const _priceData = _priceList[i];
+                const _serverLocation = serverLocations.find(location => {
+                    return _priceData.location == location.name;
+                });
+                let _loc = {
+                    city: _serverLocation.city,
+                    country: flagList[_serverLocation.country].country,
+                    flag: flagList[_serverLocation.country].flag,
+                    name: _serverLocation.country
+                }
+                _serverLocations.push(_loc);
+            }
+            setSelectedLocations(_serverLocations);
+        }
     }
 
     const gotoTopupPage = async() => {
@@ -66,25 +84,47 @@ const ChooseServer = () => {
         }
     }
 
+    const getServerLocations = async() => {
+        const _countries_res = await Http.get(baseURL + '/api/datacenter/server-locations');
+        console.log("Countries: ", _countries_res.data.data);
+        setServerLocations(_countries_res.data.data.locations);
+    }
+
+    const getEuroRate = async() => {
+        const _exchangeRate = await Http.get(baseURL + '/api/convert-price/get-exchange-rate/euro');
+        setExchangeRate(_exchangeRate.data.data.rate);
+    }
+
     const getAllServers = async() => {
-        const _servers = await Http.get(baseURL + '/admin/api/getAllServers');
-        setServers(_servers.data);
+        const _servers = await Http.get(baseURL + '/api/hetzner-api/all-server-types');
+        if(_servers.data.success){
+            setServers(_servers.data.data);
+        }
+    }
+
+    const getServers = async() => {
+        const _servers = await Http.get(baseURL + '/api/project/wizard-setting-view/2');
+        console.log("_servers : ", _servers);
     }
 
     const selectDatacenter = (idx) => {
         setSelectedDataCenter(idx);
     }
 
-    const selectFlag = (idx) => {
-        setSelectedFlagIndex(idx);
+    const selectLocation = (idx) => {
+        setSelectedLocationIndex(idx);
     }
 
-    const handleStep = () => {
-        
+    const handleStep = async() => {      const _servers = await Http.get(baseURL + '/api/hetzner-api/project-servers/NYM');
+        console.log("Project Servers :::=> ", _servers); 
     }
 
     useEffect(() => {
         getAllServers();
+        getEuroRate();
+        getServerLocations();
+        getServers();
+        // handleStep();
     }, []);
     return (
         <div className="steps">
@@ -115,10 +155,10 @@ const ChooseServer = () => {
                                                         return (
                                                             <tr key={i} onClick={()=>selectServer(i)} className={selectedId==server.id?"selected":""}>
                                                                 <td className="graytext"> { i+1 }</td>
-                                                                <td>{server.server_name}</td>
-                                                                <td><span className="vcpus"><img src={baseURL + "/img/icon-vspus.svg"} /> {server.vcpus}</span></td>
-                                                                <td className="graytext"> {server.ram}</td>
-                                                                <td><span><img src={baseURL + "/img/icon-storage.svg"} /> {server.ssd}</span></td>
+                                                                <td>{server.name}</td>
+                                                                <td><span className="vcpus"><img src={baseURL + "/img/icon-vspus.svg"} /> {server.cores+" "+server.cpu_type}</span></td>
+                                                                <td className="graytext"> {server.memory} GB</td>
+                                                                <td><span><img src={baseURL + "/img/icon-storage.svg"} /> {server.disk+" GB"}</span></td>
                                                             </tr>
                                                         );
                                                     })
@@ -163,9 +203,9 @@ const ChooseServer = () => {
                                         <Dropdown className="dropdown-currency">
                                             <Dropdown.Toggle variant="default" id="">
                                                 {
-                                                    selectedFlagIndex >= 0 ?
+                                                    selectedLocationIndex >= 0 ?
                                                     <React.Fragment>
-                                                        <img src={"/images/flags/" + flagList[selectedFlagIndex].slug + ".svg"} className="rounded-circle" /> {flagList[selectedFlagIndex].name}
+                                                        <img src={baseURL+"/images/flags/" + selectedLocations[selectedLocationIndex].flag} className="rounded-circle" /> {selectedLocations[selectedLocationIndex].city + ", " + selectedLocations[selectedLocationIndex].country}
                                                         <span className="caret"></span>
                                                     </React.Fragment> :
                                                     <React.Fragment>
@@ -177,10 +217,10 @@ const ChooseServer = () => {
 
                                             <Dropdown.Menu>
                                             {
-                                                flagList.length > 0 && flagList.map((flag, i) => {
+                                                selectedLocations.length > 0 && selectedLocations.map((location, i) => {
                                                     return(
                                                         <li key={i}>
-                                                            <Dropdown.Item onClick={()=>selectFlag(i)}><img src={"/images/flags/" + flag.slug + ".svg"} className="rounded-circle" /> { flag.name }</Dropdown.Item>
+                                                            <Dropdown.Item onClick={()=>selectLocation(i)}><img src={baseURL+"/images/flags/" + location.flag} className="rounded-circle" /> { location.city + ", " + location.country }</Dropdown.Item>
                                                         </li>
                                                     )
                                                 })
