@@ -12,7 +12,7 @@ const DepositSuccess = () => {
     const [balanceType, setBalanceType] = useState(state?state.balanceType:null);
     const [amount, setAmount] = useState(null);
     const [balance, setBalance] = useState(0);
-    const baseURL = 'http://localhost';
+    const baseURL = 'https://nodigy.com';
     const navigate = useNavigate();
 
     const gotoNextStep = () => {

@@ -12,7 +12,7 @@ const NodeInstall = () => {
     const [balance, setBalance] = useState(0);
 
     const navigate = useNavigate()
-    const apiUrl = "http://localhost";
+    const apiUrl = "https://nodigy.com";
 
     const getWalletAddress = async() => {
         const formData = new FormData();

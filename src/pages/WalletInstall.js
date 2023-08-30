@@ -19,7 +19,7 @@ const WalletInstall = () => {
     const [nextUrl, setNextUrl] = useState('/wallet-installation-success');
     const [prevUrl, setPrevUrl] = useState('/choose-server'); 
 
-    const baseURL = 'http://localhost';
+    const baseURL = 'https://nodigy.com';
     const shortenAddress = (address) => {
         let newString = address.substr(0 , 5) + "..." + address.substr(-5, 5);
         return newString;

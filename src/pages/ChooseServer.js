@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Http from "../utils/Http";
 import { Form, Dropdown } from 'react-bootstrap';
-import flagList from "../data/wallet/flagList.json"
+import flagList from "../data/wallet/flagList.json";
+import coreTypes from "../data/wallet/coreTypes.json";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
@@ -22,42 +23,22 @@ const ChooseServer = () => {
     const [step, setStep] = useState(3);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
-    const [prevUrl, setPrevUrl] = useState('http://localhost/admin/wallet-connect'); 
+    const [prevUrl, setPrevUrl] = useState('https://nodigy.com/admin/wallet-connect'); 
     const [exchangeRate, setExchangeRate] = useState(1);
     const [serverLocations, setServerLocations] = useState([]);
-    const [selectedLocations, setSelectedLocations] = useState([]);
+    const [locations, setLocations] = useState([]);
 
-    const baseURL = "http://localhost";
+    const baseURL = "https://nodigy.com";
     const navigate = useNavigate();
 
     const selectServer = (idx) => {
         const _selectedServer = servers[idx];
         setSelectedServer(_selectedServer);
         setSelectedId(_selectedServer.id);
-        const _priceList = _selectedServer.prices;
-        if(_priceList.length > 0){
-            const _price = Number((_priceList[0].price_monthly.gross * exchangeRate).toFixed(2));
-            setMonthlyPrice(_price);
-            const _limitBalance = onbordingFee*1 + _price;
-            setLimitBalance(_limitBalance);
-
-            let _serverLocations = [];
-            for(let i = 0; i < _priceList.length; i++)
-            {
-                const _priceData = _priceList[i];
-                const _serverLocation = serverLocations.find(location => {
-                    return _priceData.location == location.name;
-                });
-                let _loc = {
-                    city: _serverLocation.city,
-                    country: flagList[_serverLocation.country].country,
-                    flag: flagList[_serverLocation.country].flag,
-                    name: _serverLocation.country
-                }
-                _serverLocations.push(_loc);
-            }
-            setSelectedLocations(_serverLocations);
-        }
+        const _price = Number((_selectedServer.price_monthly_gross * exchangeRate).toFixed(2));
+        setMonthlyPrice(_price);
+        const _limitBalance = Number((onbordingFee*1 + _price).toFixed(2));
+        setLimitBalance(_limitBalance);
     }
 
     const gotoTopupPage = async() => {
@@ -67,6 +48,7 @@ const ChooseServer = () => {
             if(selectedServer) {
                 const formData = new FormData();
                 formData.append('server_id', selectedServer.id);
+                formData.append('price', limitBalance);
                 const result = await Http.post(baseURL + '/api/purchaseServer', formData);
                 const userBalance = result.data.user_balance;
                 setBalance(userBalance);
@@ -84,28 +66,49 @@ const ChooseServer = () => {
         }
     }
 
-    const getServerLocations = async() => {
-        const _countries_res = await Http.get(baseURL + '/api/datacenter/server-locations');
-        console.log("Countries: ", _countries_res.data.data);
-        setServerLocations(_countries_res.data.data.locations);
-    }
+    // const getServerLocations = async() => {
+    //     const _countries_res = await Http.get(baseURL + '/api/datacenter/server-locations');
+    //     console.log("Countries: ", _countries_res.data.data);
+    //     setServerLocations(_countries_res.data.data.locations);
+    // }
 
     const getEuroRate = async() => {
         const _exchangeRate = await Http.get(baseURL + '/api/convert-price/get-exchange-rate/euro');
         setExchangeRate(_exchangeRate.data.data.rate);
     }
 
-    const getAllServers = async() => {
-        const _servers = await Http.get(baseURL + '/api/hetzner-api/all-server-types');
-        if(_servers.data.success){
-            setServers(_servers.data.data);
+    // const getProjectServers = async() => {
+    //     const _servers = await Http.get(baseURL + '/api/hetzner-api/project-servers/NYM');
+    //     if(_servers.data.success){
+    //         setServers(_servers.data.data);
+    //     }
+    // }
+
+    const testServers = async() => {
+        const project_id = 2;
+        const _result = await Http.get(baseURL + '/api/datacenter/country?project_id='+project_id);
+        const _serverLocations = _result.data.data;
+        setServerLocations(_serverLocations);
+
+        let _locations = [];
+        for(let i = 0; i < _serverLocations.length; i++)
+        {
+            const _serverLoc = _serverLocations[i];
+            let _loc = {
+                city: _serverLoc.city,
+                country: flagList[_serverLoc.country].country,
+                flag: flagList[_serverLoc.country].flag,
+                name: _serverLoc.country
+            }
+            _locations.push(_loc);
         }
+        setLocations(_locations);
+        setSelectedLocationIndex(0);
+        const _serverLocation = _serverLocations[0];
+        const _servers = _serverLocation.server;
+        setServers(_servers);
     }
 
-    const getServers = async() => {
-        const _servers = await Http.get(baseURL + '/api/project/wizard-setting-view/2');
-        console.log("_servers : ", _servers);
-    }
 
     const selectDatacenter = (idx) => {
         setSelectedDataCenter(idx);
@@ -113,18 +116,17 @@ const ChooseServer = () => {
 
     const selectLocation = (idx) => {
         setSelectedLocationIndex(idx);
-    }
-
-    const handleStep = async() => {      const _servers = await Http.get(baseURL + '/api/hetzner-api/project-servers/NYM');
-        console.log("Project Servers :::=> ", _servers); 
+        const _serverLocation = serverLocations[idx];
+        const _servers = _serverLocation.server;
+        setServers(_servers);
+        
     }
 
     useEffect(() => {
-        getAllServers();
+        // getProjectServers();
         getEuroRate();
-        getServerLocations();
-        getServers();
-        // handleStep();
+        // getServerLocations();
+        testServers();
     }, []);
     return (
         <div className="steps">
@@ -155,8 +157,8 @@ const ChooseServer = () => {
                                                         return (
                                                             <tr key={i} onClick={()=>selectServer(i)} className={selectedId==server.id?"selected":""}>
                                                                 <td className="graytext"> { i+1 }</td>
-                                                                <td>{server.name}</td>
-                                                                <td><span className="vcpus"><img src={baseURL + "/img/icon-vspus.svg"} /> {server.cores+" "+server.cpu_type}</span></td>
+                                                                <td>{server.location}</td>
+                                                                <td><span className="vcpus"><img src={baseURL + "/img/icon-vspus.svg"} /> {server.cores + " core " + coreTypes[server.type-1].name}</span></td>
                                                                 <td className="graytext"> {server.memory} GB</td>
                                                                 <td><span><img src={baseURL + "/img/icon-storage.svg"} /> {server.disk+" GB"}</span></td>
                                                             </tr>
@@ -202,22 +204,22 @@ const ChooseServer = () => {
                                         <label>Choose a country</label>
                                         <Dropdown className="dropdown-currency">
                                             <Dropdown.Toggle variant="default" id="">
-                                                {
-                                                    selectedLocationIndex >= 0 ?
-                                                    <React.Fragment>
-                                                        <img src={baseURL+"/images/flags/" + selectedLocations[selectedLocationIndex].flag} className="rounded-circle" /> {selectedLocations[selectedLocationIndex].city + ", " + selectedLocations[selectedLocationIndex].country}
-                                                        <span className="caret"></span>
-                                                    </React.Fragment> :
-                                                    <React.Fragment>
-                                                        <a>Please select country</a>
-                                                        <span className="caret"></span>
-                                                    </React.Fragment>
-                                                }
+                                            {
+                                                selectedLocationIndex >= 0 ?
+                                                <React.Fragment>
+                                                    <img src={baseURL+"/images/flags/" + locations[selectedLocationIndex].flag} className="rounded-circle" /> {locations[selectedLocationIndex].city + ", " + locations[selectedLocationIndex].country}
+                                                    <span className="caret"></span>
+                                                </React.Fragment> :
+                                                <React.Fragment>
+                                                    <a>Please select country</a>
+                                                    <span className="caret"></span>
+                                                </React.Fragment>
+                                            }
                                             </Dropdown.Toggle>
 
                                             <Dropdown.Menu>
                                             {
-                                                selectedLocations.length > 0 && selectedLocations.map((location, i) => {
+                                                locations.length > 0 && locations.map((location, i) => {
                                                     return(
                                                         <li key={i}>
                                                             <Dropdown.Item onClick={()=>selectLocation(i)}><img src={baseURL+"/images/flags/" + location.flag} className="rounded-circle" /> { location.city + ", " + location.country }</Dropdown.Item>
