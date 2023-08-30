@@ -4,7 +4,7 @@ import Http from "../utils/Http";
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const baseURL = "http://localhost";
+    const baseURL = "https://nodigy.com";
     const handleChange = (e) => {
         e.preventDefault();
         const name = e.target.name;

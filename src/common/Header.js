@@ -16,7 +16,7 @@ const Header = ({setBalance, myBalance}) => {
     const [user, setUser] = useState(null);
     const [userBalance, setUserBalance] = useState(0);
 
-    const baseURL = "http://localhost";
+    const baseURL = "https://nodigy.com";
 
     const getApiUser = async() => {
       try{

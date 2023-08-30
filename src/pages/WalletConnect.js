@@ -43,7 +43,7 @@ const WalletConnect = () => {
     const [wallet, setWallet] = useState(null);
     const [chain, setChain] = useState(null);
 
-    const baseURL = "http://localhost";
+    const baseURL = "https://nodigy.com";
 
     const changeMode = () => {
         darkMode ? setDarkMode(false) : setDarkMode(true);

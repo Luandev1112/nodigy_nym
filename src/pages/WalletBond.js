@@ -44,7 +44,7 @@ const ChooseServer = () => {
         return newString;
     }
 
-    const baseURL = "http://localhost";
+    const baseURL = "https://nodigy.com";
     const navigate = useNavigate();
 
     const getAllServers = async() => {

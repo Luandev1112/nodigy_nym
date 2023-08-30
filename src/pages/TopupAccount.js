@@ -40,7 +40,7 @@ const TopupAccount = () => {
   const receiverAddress = "TJ4jSwMBREYysPQcjATTy52AXdXrdVXhM2";
   // const receiverAddress = "TCPnqhNozXMaY4gFxvLWKS26FmPhDHvWvD";
   const transactionUrl = "https://nile.tronscan.io/#/transaction/";
-  const baseUrl = "http://localhost";
+  const baseUrl = "https://nodigy.com";
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -86,7 +86,7 @@ const TopupAccount = () => {
         } else if (tabType == "crypto") {
           console.log(typeof walletPrice);
           await paymentByWallet();
-          navigate('/');
+          navigate('/choose-server');
         }
 
         break;

@@ -6,10 +6,10 @@ const First = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const _token = urlParams.get('token');
-    const baseUrl = "http://localhost";
+    const baseUrl = "https://nodigy.com";
     const navigate = useNavigate();
 
-    const API_URL = (process.env.NODE_ENV === 'test') ? process.env.BASE_URL || (`http://localhost:${process.env.PORT}/`) : `/`;
+    const API_URL = (process.env.NODE_ENV === 'test') ? process.env.BASE_URL || (`https://nodigy.com:${process.env.PORT}/`) : `/`;
     const barearToken = 'Bearer '+_token;
     // let token = document.head.querySelector('meta[name="csrf-token"]');
     axios.defaults.baseURL = API_URL;
