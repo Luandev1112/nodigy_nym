@@ -3,10 +3,11 @@ import { Button, Dropdown, Form, Modal } from "react-bootstrap";
 import Http from "../utils/Http";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 import { useNavigate } from 'react-router-dom';
-
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import ProgressBar from "../common/ProgressBar";
+import LoadingSpinner from "../common/LoadingSpinner";
+import { sendTrc20 } from "../utils/script";
 
 const TopupAccount = () => {
   const [cardNumber, setCardNumber] = useState("1234 5678 89012 3456");
@@ -28,6 +29,7 @@ const TopupAccount = () => {
   const mediaUrl = "https://static.nodigy.com/";
   const [balance, setBalance] = useState(0);
   const [error, setError] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
 
   const [step, setStep] = useState(4);
   const [subStep, setSubStep] = useState(0);
@@ -84,7 +86,6 @@ const TopupAccount = () => {
           // setSubStep('deposit-success');
           // setStep(5);
         } else if (tabType == "crypto") {
-          console.log(typeof walletPrice);
           await paymentByWallet();
           navigate('/choose-server');
         }
@@ -115,6 +116,7 @@ const TopupAccount = () => {
   const paymentByWallet = async () => {
     if (typeof walletPrice * 1 != "NaN" && walletPrice < maxToken) {
       if (selectedWallet.supp_wallet_name.toLowerCase() == "tronlink") {
+        setLoadingStatus(true);
         const tronWeb = window.tronWeb;
 
         var senderAddress = connectedWallet.address;
@@ -167,6 +169,7 @@ const TopupAccount = () => {
             setBalance(_myBalance);
           }
         }
+        setLoadingStatus(false);
       }
     }
   };
@@ -250,6 +253,7 @@ const TopupAccount = () => {
     <div className="steps">
       <Header setBalance={setBalance} />
       <ProgressBar step={5} />
+      {loadingStatus&&<LoadingSpinner />}
       <div className="steps-content fullwidthcontainer fiatscreen step5">
         <div className="container">
           <div className="row">

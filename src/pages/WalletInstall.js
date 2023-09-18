@@ -32,14 +32,14 @@ const WalletInstall = () => {
         setWalletAddress(value);
     } 
 
-    const handleStep = () => {
+    const handleStep = async() => {
         let _walletStatus = false;
         if(walletAddress.length == 40 && walletAddress.slice(0,2) == 'n1')
         {
             const formData = new FormData();
             formData.append('wallet_address', walletAddress);
             formData.append('project_name', 'NYM');
-            const result = Http.post(baseURL+'/api/addWallet', formData);
+            const result = await Http.post(baseURL+'/api/addWallet', formData);
             console.log("result : ", result);
             _walletStatus = true;
             setWalletStatus(true);

@@ -1,25 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Http from "../utils/Http";
-import { Form, Dropdown } from 'react-bootstrap';
 import CopyImage from "../assets/images/icon-copy.svg";
-
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
+import { apiUrl } from "../utils/script";
 
 const ChooseServer = () => {
-    const [servers, setServers] = useState([]);
+    const [node, setNode] = useState(0);
     const [balance, setBalance] = useState(0);
-    const [walletAddress, setWalletAddress] = useState('0x425BEde68e1bF2bD9f76432E5eA9e22BE71257a9');
-    const [idKey, setIdKey] = useState('0x12ff65BC4c9818B0721fc23a79B1cDcE891cEa83');
-    const [sphinxKey, setSphinxKey] = useState('0x12ff65BC4c9818B0721fc23a79B1cDcE891cEa83');
-    const [host, setHost] = useState('5.161.53.14');
-    const [version, setVersion] = useState('1.1.18');
-    const [mixPort, setMixPort] = useState(8080);
-    const [verlocPort, setVerlocPort] = useState(8090);
-    const [httpPort, setHttpPort] = useState(5000);
+    const [walletAddress, setWalletAddress] = useState('');
+    const [idKey, setIdKey] = useState('');
+    const [sphinxKey, setSphinxKey] = useState('');
+    const [host, setHost] = useState('');
+    const [version, setVersion] = useState('');
+    const [mixPort, setMixPort] = useState();
+    const [verlocPort, setVerlocPort] = useState();
+    const [httpPort, setHttpPort] = useState();
     const [signatureWallet, setSignatureWallet] = useState('');
+    const [intervalSecond, setIntervalSecond] = useState(0);
     const [step1, setStep1] = useState(false);
     const [step2, setStep2] = useState(false);
     const [step3, setStep3] = useState(false);
@@ -28,7 +28,6 @@ const ChooseServer = () => {
     const [messageText, setMessageText] = useState('');
     const [messageClass, setMessageClass] = useState('btn-gray');
     const [finishClass, setFinishClass] = useState('btn-gray');
-
     const [step, setStep] = useState(5);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
@@ -44,14 +43,7 @@ const ChooseServer = () => {
         return newString;
     }
 
-    const baseURL = "https://nodigy.com";
     const navigate = useNavigate();
-
-    const getAllServers = async() => {
-        const _servers = await Http.get(baseURL + '/admin/api/getAllServers');
-        setServers(_servers.data);
-    }
-
     const handleChange = (e) => {
         // e.preventDefault();
         const name = e.target.name;
@@ -81,22 +73,102 @@ const ChooseServer = () => {
         }
     }
 
-    const messageSubmit = () => {
-        if(messageText.length > 0)
+    const messageSubmit = async() => {
+        if(messageText.length > 0 && node != null)
         {
-            setSignatureWallet(walletAddress);
             setStep5(true);
-            setFinishClass('');
+            const formData = new FormData();
+            formData.append('node_id', node.id);
+            formData.append('signature_message', messageText);
+            const result = await Http.post(apiUrl+'/api/wizard-setting-nym/add-first-signature', formData);
+            console.log(result);
         }
     }
 
-    const gotoNextPage = () => {
-        navigate('/node-installation-success');
+    const gotoNextPage = async() => {
+        if(finishClass == '')
+        {
+            const formData = new FormData();
+            formData.append('node_id', node.id);
+            formData.append('node_status', 1);
+            const result = await Http.post(apiUrl+'/api/set-node-status', formData);
+            navigate('/node-installation-success');
+        }
+    }
+
+    const conpyLink = async(address) => {
+        if(address != "") {
+            await navigator.clipboard.writeText(address);
+        }
+    }
+
+    const getInitNode = async() => {
+        let _initNodeResult = await Http.get(apiUrl+'/api/getInitialNode');
+        if(_initNodeResult.data.status == 1) {
+            const _node = _initNodeResult.data.node;
+            if(_node != null){
+                setNode(_node);
+                const formData = new FormData();
+                formData.append('project_id', _node.project_id);
+                formData.append('node_id', _node.id);
+                const _statusResult = await Http.post(apiUrl+'/api/wizard-setting-nym/view', formData); 
+                if(_statusResult.data.success){
+                    const installationData = _statusResult.data.data;
+                    console.log("Installation Data: ", installationData);
+                    setWalletAddress(installationData.wallet);
+                    setIdKey(installationData.identity_key);
+                    setSphinxKey(installationData.sphinx_key);
+                    setHost(installationData.host_bind_address);
+                    setVersion(installationData.version);
+                    setMixPort(installationData.mix_port);
+                    setVerlocPort(installationData.verloc_port);
+                    setHttpPort(installationData.http_port);
+                } else {
+                    console.log("There are some errors in installation");
+                }  
+            }
+        }else{
+
+        }
+    }
+
+    const getInstallationStatus = async() => {
+        try {
+            if(node != null){
+                const formData = new FormData();
+                formData.append('project_id', node.project_id);
+                formData.append('node_id', node.id);
+                const _statusResult = await Http.post(apiUrl+'/api/wizard-setting-nym/view', formData); 
+                if(_statusResult.data.success){
+                    const installationData = _statusResult.data.data;
+                    const fullStep = installationData.full_step;
+                    const prevStep = installationData.previous_succesfull_step;
+                    const stepDescription = installationData.step_description;
+        
+                    if(fullStep == prevStep) {
+                        setSignatureWallet(installationData.signature_second_key);
+                        setFinishClass('');
+                    }
+                } else {
+                    console.log("There are some errors in installation");
+                }  
+            }
+        } catch (error) {
+            console.log("Exception error: ", error);
+        }
+        setTimeout(() => {
+            setIntervalSecond(intervalSecond + 1);
+        }, 10000);
     }
 
     useEffect(() => {
-        getAllServers();
+        getInitNode();
     }, []);
+
+    useEffect(() => {
+        getInstallationStatus();
+
+    }, [intervalSecond]);
     return (
         <div className="steps">
             <Header setBalance={setBalance} myBalance={balance} />
@@ -167,35 +239,35 @@ const ChooseServer = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td className="td-name">Use this wallet:</td>
-                                                        <td className="text-end"><span>{shortenAddressString(walletAddress, 26)}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(walletAddress, 26)}</span><a onClick={()=>conpyLink(walletAddress)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Identity Key: </td>
-                                                        <td className="text-end"><span>{shortenAddressString(idKey, 26)}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(idKey, 26)}</span><a onClick={()=>conpyLink(idKey)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Sphinx Key:</td>
-                                                        <td className="text-end"><span>{shortenAddressString(sphinxKey, 26)}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(sphinxKey, 26)}</span><a onClick={()=>conpyLink(sphinxKey)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Host (bind address): </td>
-                                                        <td className="text-end"><span>{host}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{host}</span><a onClick={()=>conpyLink(host)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Version:</td>
-                                                        <td className="text-end"><span>{version}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{version}</span><a onClick={()=>conpyLink(version)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Mix Port:</td>
-                                                        <td className="text-end"><span>{mixPort}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{mixPort}</span><a onClick={()=>conpyLink(mixPort)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Verloc port:</td>
-                                                        <td className="text-end"><span>{verlocPort}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{verlocPort}</span><a onClick={()=>conpyLink(verlocPort)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Http Port:</td>
-                                                        <td className="text-end"><span>{httpPort}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{httpPort}</span><a onClick={()=>conpyLink(httpPort)}> <img src={CopyImage} /></a></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -204,7 +276,7 @@ const ChooseServer = () => {
                                         <div className="mt-4 message-group">
                                             <h4>4. Copy message you received in your wallet and paste it in the field below:</h4>
                                             <div className="form-group mb-2">
-                                                <textarea className="wallet-message" name="message" onChange={handleChange}>{messageText}</textarea>
+                                                <textarea className="wallet-message" name="message" onChange={handleChange} value={messageText} />
                                             </div>
                                             <a onClick={messageSubmit} className={"btn btn-primary py-2 "+messageClass}>Submit</a>
                                         </div>
@@ -217,7 +289,7 @@ const ChooseServer = () => {
                                                         <td className="td-name">Signature:</td>
                                                         <td className="text-end"><span>{shortenAddressString(signatureWallet, 26)}</span>
                                                         {
-                                                            shortenAddressString(signatureWallet, 26) != '' && <a href="#"> <img src={CopyImage} /></a>
+                                                            shortenAddressString(signatureWallet, 26) != '' && <a onClick={()=>conpyLink(signatureWallet)} > <img src={CopyImage} /></a>
                                                         }
                                                         </td>
                                                     </tr>

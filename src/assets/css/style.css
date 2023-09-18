@@ -3095,3 +3095,15 @@ body.lightmode .custable tr th .dropdown button {
 .table>:not(caption)>*>* {
 	background-color: unset !important;
 }
+
+.node-install-progress {
+	width: 280px;
+	height: 280px;
+	background: url(../images/step-loader-img.svg) no-repeat center;
+}
+
+.node-install-progressbar{
+	width: 120px !important;
+	height: 120px !important;
+	margin: 76px;
+}

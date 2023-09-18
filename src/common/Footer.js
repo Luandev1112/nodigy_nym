@@ -13,10 +13,10 @@ const Footer = ({step, prevUrl, nextUrl, handleStep}) => {
         }
     }
 
-    const nextStep = () => {
+    const nextStep = async() => {
         let status = true;
         if(step == 6) {
-            status = handleStep();
+            status = await handleStep();
             console.log("Handle step status", status);
         }
         if(status) {

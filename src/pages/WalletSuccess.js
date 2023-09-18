@@ -5,7 +5,7 @@ import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
-import CopyImage from '../assets/images/icon-copy.svg';
+
 const WalletSuccess = () => {
     const [balance, setBalance] = useState(0);
     const [amount, setAmount] = useState(0);
@@ -13,13 +13,36 @@ const WalletSuccess = () => {
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
     const [prevUrl, setPrevUrl] = useState(''); 
+    const [nodeId, setNodeId] = useState(0);
+    const [projectId, setProjectId] = useState(0);
+    const [serverId, setServerId] = useState(0);
     const navigate = useNavigate();
+    const baseURL = "https://nodigy.com";
 
-    const gotoNextStep = () => {
+    const gotoNextStep = async() => {
+        const formData = new FormData();
+        formData.append('node_id', nodeId);
+        formData.append('project_id', projectId);
+        formData.append('server_id', serverId);
+        const result = await Http.post(baseURL+'/api/wizard-setting-nym/node-installation-start', formData);
+        console.log("Result::", result);
+
         navigate('/node-install');
     }
+
+    const getInitNode = async() => {
+        let _initNode = await Http.get(baseURL+'/api/getInitialNode');
+        console.log(_initNode);
+        const _nodeId = _initNode.data.node.id;
+        setNodeId(_nodeId);
+        const _projectId = _initNode.data.project.id;
+        setProjectId(_projectId);
+        const _serverId = _initNode.data.node.server_id;
+        setServerId(_serverId);
+    }
+
     useEffect(()=>{
-        
+        getInitNode();
     }, []); 
     return (
         <div className="steps">
