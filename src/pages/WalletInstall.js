@@ -8,6 +8,7 @@ import ArrowRightImage from "../assets/images/arrow-right.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
+import { apiUrl } from '../utils/script';
 
 const WalletInstall = () => {
     const [node, selectedNode] = useState(null);
@@ -19,7 +20,6 @@ const WalletInstall = () => {
     const [nextUrl, setNextUrl] = useState('/wallet-installation-success');
     const [prevUrl, setPrevUrl] = useState('/choose-server'); 
 
-    const baseURL = 'https://nodigy.com';
     const shortenAddress = (address) => {
         let newString = address.substr(0 , 5) + "..." + address.substr(-5, 5);
         return newString;
@@ -39,7 +39,7 @@ const WalletInstall = () => {
             const formData = new FormData();
             formData.append('wallet_address', walletAddress);
             formData.append('project_name', 'NYM');
-            const result = await Http.post(baseURL+'/api/addWallet', formData);
+            const result = await Http.post(apiUrl+'/api/addWallet', formData);
             console.log("result : ", result);
             _walletStatus = true;
             setWalletStatus(true);
@@ -55,8 +55,7 @@ const WalletInstall = () => {
     }, []);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={3} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">

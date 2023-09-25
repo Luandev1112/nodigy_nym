@@ -2,10 +2,11 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Http from "../utils/Http";
 import CopyImage from "../assets/images/icon-copy.svg";
+import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
-import { apiUrl } from "../utils/script";
+import { apiUrl, shortenAddressString } from "../utils/script";
 
 const ChooseServer = () => {
     const [node, setNode] = useState(0);
@@ -32,16 +33,10 @@ const ChooseServer = () => {
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
     const [prevUrl, setPrevUrl] = useState('/wallet-install'); 
-
-    const shortenAddressString = (address, length) => {
-        let newString = '';
-        if(address.length > length){
-            newString = address.substr(0 , length) + "...";   
-        }else{
-            newString = address;
-        }
-        return newString;
-    }
+    const [copyContent, setCopyContent] = useState('');
+    const [submitStatus, setSubmitStatus] = useState(false);
+    const [submitBtnText, setSubmitBtnText] = useState("Submit");
+    const [intervalStatus, setIntervalStatus] = useState(true);
 
     const navigate = useNavigate();
     const handleChange = (e) => {
@@ -74,14 +69,22 @@ const ChooseServer = () => {
     }
 
     const messageSubmit = async() => {
-        if(messageText.length > 0 && node != null)
+        if(messageText.length > 0 && node != null && !submitStatus && submitBtnText == 'Submit')
         {
+            setSubmitStatus(true);
             setStep5(true);
             const formData = new FormData();
             formData.append('node_id', node.id);
             formData.append('signature_message', messageText);
-            const result = await Http.post(apiUrl+'/api/wizard-setting-nym/add-first-signature', formData);
-            console.log(result);
+            try {
+                const result = await Http.post(apiUrl+'/api/wizard-setting-nym/add-first-signature', formData);
+                if(result.data.success) {
+                    setSubmitBtnText("Submitted");
+                }
+            } catch (error) {
+                
+            }
+            setSubmitStatus(false);
         }
     }
 
@@ -92,12 +95,21 @@ const ChooseServer = () => {
             formData.append('node_id', node.id);
             formData.append('node_status', 1);
             const result = await Http.post(apiUrl+'/api/set-node-status', formData);
-            navigate('/node-installation-success');
+            console.log("result.data.status: ", result.status);
+            if(result.status == 200) {
+                navigate('/node-installation-success', {
+                    state: {
+                        nodeId: node.id,
+                        projectId: node.project_id
+                    }
+                });
+            }
         }
     }
 
-    const conpyLink = async(address) => {
-        if(address != "") {
+    const copyLink = async(address, term) => {
+        if(address != null && address != "") {
+            setCopyContent(term);
             await navigator.clipboard.writeText(address);
         }
     }
@@ -146,8 +158,17 @@ const ChooseServer = () => {
                     const stepDescription = installationData.step_description;
         
                     if(fullStep == prevStep) {
+                        setSubmitBtnText("Submitted");
+                        setMessageText(installationData.signature_first_key);
                         setSignatureWallet(installationData.signature_second_key);
                         setFinishClass('');
+                        setIntervalStatus(false);
+                        // set all steps as true
+                        setStep1(true);  
+                        setStep2(true);  
+                        setStep3(true);  
+                        setStep4(true);    
+                        setStep5(true);  
                     }
                 } else {
                     console.log("There are some errors in installation");
@@ -156,9 +177,12 @@ const ChooseServer = () => {
         } catch (error) {
             console.log("Exception error: ", error);
         }
-        setTimeout(() => {
-            setIntervalSecond(intervalSecond + 1);
-        }, 10000);
+        if(intervalStatus) {
+            console.log("set Interval status : ", intervalStatus);
+            setTimeout(() => {
+                setIntervalSecond(intervalSecond + 1);
+            }, 5000);
+        }
     }
 
     useEffect(() => {
@@ -171,8 +195,7 @@ const ChooseServer = () => {
     }, [intervalSecond]);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={3} />
             <div className="steps-content fullwidthcontainer fiatscreen step5">
                 <div className="container">
                     <div className="row">
@@ -239,35 +262,35 @@ const ChooseServer = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td className="td-name">Use this wallet:</td>
-                                                        <td className="text-end"><span>{shortenAddressString(walletAddress, 26)}</span><a onClick={()=>conpyLink(walletAddress)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(walletAddress, 26)}</span><a onClick={()=>copyLink(walletAddress, 'wallet')}> <img src={copyContent=='wallet'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Identity Key: </td>
-                                                        <td className="text-end"><span>{shortenAddressString(idKey, 26)}</span><a onClick={()=>conpyLink(idKey)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(idKey, 26)}</span><a onClick={()=>copyLink(idKey, 'idkey')}> <img src={copyContent=='idkey'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Sphinx Key:</td>
-                                                        <td className="text-end"><span>{shortenAddressString(sphinxKey, 26)}</span><a onClick={()=>conpyLink(sphinxKey)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(sphinxKey, 26)}</span><a onClick={()=>copyLink(sphinxKey, 'spkey')}> <img src={copyContent=='spkey'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Host (bind address): </td>
-                                                        <td className="text-end"><span>{host}</span><a onClick={()=>conpyLink(host)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{host}</span><a onClick={()=>copyLink(host, 'bind')}> <img src={copyContent=='bind'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Version:</td>
-                                                        <td className="text-end"><span>{version}</span><a onClick={()=>conpyLink(version)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{version}</span><a onClick={()=>copyLink(version, 'version')}> <img src={copyContent=='version'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Mix Port:</td>
-                                                        <td className="text-end"><span>{mixPort}</span><a onClick={()=>conpyLink(mixPort)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{mixPort}</span><a onClick={()=>copyLink(mixPort, 'mixport')}> <img src={copyContent=='mixport'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Verloc port:</td>
-                                                        <td className="text-end"><span>{verlocPort}</span><a onClick={()=>conpyLink(verlocPort)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{verlocPort}</span><a onClick={()=>copyLink(verlocPort, 'verport')}> <img src={copyContent=='verport'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Http Port:</td>
-                                                        <td className="text-end"><span>{httpPort}</span><a onClick={()=>conpyLink(httpPort)}> <img src={CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{httpPort}</span><a onClick={()=>copyLink(httpPort, 'httpport')}> <img src={copyContent=='httpport'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -278,7 +301,7 @@ const ChooseServer = () => {
                                             <div className="form-group mb-2">
                                                 <textarea className="wallet-message" name="message" onChange={handleChange} value={messageText} />
                                             </div>
-                                            <a onClick={messageSubmit} className={"btn btn-primary py-2 "+messageClass}>Submit</a>
+                                            <a onClick={messageSubmit} className={"btn btn-primary py-2 "+messageClass}>{submitStatus?<div className="button-spinner"></div>:submitBtnText}</a>
                                         </div>
 
                                         <div className="mt-4 signature-group">
@@ -289,7 +312,7 @@ const ChooseServer = () => {
                                                         <td className="td-name">Signature:</td>
                                                         <td className="text-end"><span>{shortenAddressString(signatureWallet, 26)}</span>
                                                         {
-                                                            shortenAddressString(signatureWallet, 26) != '' && <a onClick={()=>conpyLink(signatureWallet)} > <img src={CopyImage} /></a>
+                                                            shortenAddressString(signatureWallet, 26) != '' && <a onClick={()=>copyLink(signatureWallet, 'signature')} > <img src={copyContent=='signature'?CheckCircleImage:CopyImage} /></a>
                                                         }
                                                         </td>
                                                     </tr>

@@ -8,9 +8,6 @@ import IconSettingsImage from "../assets/images/icon-setings.png";
 import IconLogoutImage from "../assets/images/icon-setings.png";
 import ProfileImage from "../assets/images/profile-img.png";
 
-import Step3 from "../components/wallet/step3";
-import Step4 from "../components/wallet/step4";
-import Fiat1 from "../components/wallet/fiat1";
 import WalletList from "../components/wallet/WalletList";
 import ChooseServer from "../components/wallet/ChooseServer";
 import TopupAccount from "../components/wallet/TopupAccount";

@@ -3,8 +3,8 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import Http from '../utils/Http';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
+import { apiUrl } from '../utils/script';
 
 const WalletSuccess = () => {
     const [balance, setBalance] = useState(0);
@@ -17,21 +17,19 @@ const WalletSuccess = () => {
     const [projectId, setProjectId] = useState(0);
     const [serverId, setServerId] = useState(0);
     const navigate = useNavigate();
-    const baseURL = "https://nodigy.com";
 
-    const gotoNextStep = async() => {
+    const gotoNextStep = () => {
         const formData = new FormData();
         formData.append('node_id', nodeId);
         formData.append('project_id', projectId);
         formData.append('server_id', serverId);
-        const result = await Http.post(baseURL+'/api/wizard-setting-nym/node-installation-start', formData);
+        const result = Http.post(apiUrl+'/api/wizard-setting-nym/node-installation-start', formData);
         console.log("Result::", result);
-
         navigate('/node-install');
     }
 
     const getInitNode = async() => {
-        let _initNode = await Http.get(baseURL+'/api/getInitialNode');
+        let _initNode = await Http.get(apiUrl+'/api/getInitialNode');
         console.log(_initNode);
         const _nodeId = _initNode.data.node.id;
         setNodeId(_nodeId);
@@ -46,8 +44,7 @@ const WalletSuccess = () => {
     }, []); 
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={3} />
             <div className="steps-content wallet-installation-success">
                 <div className="container">
                     <div className="row">

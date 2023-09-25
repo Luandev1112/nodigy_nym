@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { apiUrl } from '../utils/script';
 
 const First = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const _token = urlParams.get('token');
-    const baseUrl = "https://nodigy.com";
     const navigate = useNavigate();
 
     const API_URL = (process.env.NODE_ENV === 'test') ? process.env.BASE_URL || (`https://nodigy.com:${process.env.PORT}/`) : `/`;
@@ -18,13 +18,13 @@ const First = () => {
     axios.defaults.headers.common.Authorization = barearToken;
     // axios.defaults.headers.common['X-CSRF-Token'] = token.content;
     axios.defaults.headers.common['Content-Type'] = 'multipart/form-data';
-    axios.get(baseUrl + '/api/user').then(res => {
+    axios.get(apiUrl + '/api/user').then(res => {
         if(res.status == 200) {
             localStorage.setItem('access_token', _token);
             navigate('/choose-server');
         }
     }).catch((error)=>{
-        window.location.href = baseUrl + "/admin/wallet-connect";
+        window.location.href = apiUrl + "/admin/wallet-connect";
     })
 
     useEffect(()=>{

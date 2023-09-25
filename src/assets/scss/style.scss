@@ -6,7 +6,7 @@
 // @import url('../css/bootstrap/bootstrap-utilities.css');
 // @import url('../css/bootstrap/bootstrap-grid.css');
 
-// @import 'font/font';
+@import 'font/font';
 
 @import url('../css/slick.css');
 @import url('../css/slicktheme.css');
@@ -14,18 +14,21 @@
 // @import url('../css/font-awesome.min.css');
 // @import url('../css/owl.carousel.min.css');
 @import url('../css/style.css');
-@import url('../css/frontstyle.css');
+// @import url('../css/frontstyle.css');
 
-// @import 'default/variables';
+@import 'default/variables';
 // @import 'default/mixins';
 // @import 'default/reset';
 // @import 'default/typography';
-// @import 'default/extend';
+@import 'default/extend';
 // @import 'default/animations';
 // @import 'default/shortcode';
 // @import 'default/spacing';
-// @import 'default/common';
+@import 'default/common';
 // @import 'default/forms';
+
+@import 'elements/front';
+// @import 'elements/admin';
 
 /**************************************
     Theme Styles
