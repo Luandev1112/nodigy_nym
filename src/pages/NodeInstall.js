@@ -8,6 +8,7 @@ import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
 import {CircularProgressbar} from 'react-circular-progressbar';
 import "react-circular-progressbar/dist/styles.css";
+import { apiUrl, shortenAddress } from '../utils/script';
 const NodeInstall = () => {
     const [walletAddress, setWalletAddress] = useState("");
     const [balance, setBalance] = useState(0);
@@ -18,7 +19,6 @@ const NodeInstall = () => {
     const [installTitle, setInstallTitle] = useState("Installation in progress");
     const [installDescription, setInstallDescription] = useState('The installation process may take from 2 hours to 3 days');
     const navigate = useNavigate();
-    const apiUrl = "https://nodigy.com";
 
     const getWalletAddress = async() => {
         const formData = new FormData();
@@ -26,16 +26,6 @@ const NodeInstall = () => {
         const res = await Http.post(apiUrl + "/api/getNodeWallet", formData);
         const _walletAddress = res.data.wallet;
         setWalletAddress(_walletAddress);
-    }
-
-    const shortenAddress = (address) => {
-        let newString = '';
-        if(address.length <= 10){
-            newString = address;
-        }else{
-            newString = address.substr(0 , 5) + "..." + address.substr(-5, 5);
-        }
-        return newString;
     }
 
     const getInstallationStatus = async() => {
@@ -102,8 +92,7 @@ const NodeInstall = () => {
     }, [intervalSecond]);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={3} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">

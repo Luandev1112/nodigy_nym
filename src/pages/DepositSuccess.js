@@ -3,7 +3,6 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import Http from '../utils/Http';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
 import CopyImage from '../assets/images/icon-copy.svg';
 const DepositSuccess = () => {
@@ -36,8 +35,7 @@ const DepositSuccess = () => {
     return (
         amount &&
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={3} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">

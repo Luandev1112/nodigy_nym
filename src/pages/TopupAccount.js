@@ -5,9 +5,9 @@ import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 import { useNavigate } from 'react-router-dom';
 import Header from "../common/Header";
 import Footer from "../common/Footer";
-import ProgressBar from "../common/ProgressBar";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { sendTrc20 } from "../utils/script";
+import { apiUrl } from "../utils/script";
 
 const TopupAccount = () => {
   const [cardNumber, setCardNumber] = useState("1234 5678 89012 3456");
@@ -39,10 +39,7 @@ const TopupAccount = () => {
   // TronLink transaction constant settings
   // const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
   const contractWalletAddress = "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf";
-  const receiverAddress = "TJ4jSwMBREYysPQcjATTy52AXdXrdVXhM2";
-  // const receiverAddress = "TCPnqhNozXMaY4gFxvLWKS26FmPhDHvWvD";
-  const transactionUrl = "https://nile.tronscan.io/#/transaction/";
-  const baseUrl = "https://nodigy.com";
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -87,7 +84,6 @@ const TopupAccount = () => {
           // setStep(5);
         } else if (tabType == "crypto") {
           await paymentByWallet();
-          navigate('/choose-server');
         }
 
         break;
@@ -114,62 +110,37 @@ const TopupAccount = () => {
   };
 
   const paymentByWallet = async () => {
-    if (typeof walletPrice * 1 != "NaN" && walletPrice < maxToken) {
-      if (selectedWallet.supp_wallet_name.toLowerCase() == "tronlink") {
+    if (typeof walletPrice * 1 != "NaN" && walletPrice < maxToken ) {
+      if(walletPrice > 0) {
         setLoadingStatus(true);
-        const tronWeb = window.tronWeb;
+        try {
+          let broadcastTransaction = await sendTrc20(walletPrice, connectedWallet.address);
+          if (broadcastTransaction.result) {
+            const _transactionId = broadcastTransaction.txid;
 
-        var senderAddress = connectedWallet.address;
-        var _amount = walletPrice * 1000000;
-
-        var parameter = [
-          { type: "address", value: receiverAddress },
-          { type: "uint256", value: _amount },
-        ];
-        var options = {
-          feeLimit: 100000000,
-        };
-
-        const transactionObject =
-          await tronWeb.transactionBuilder.triggerSmartContract(
-            tronWeb.address.toHex(contractWalletAddress),
-            "transfer(address,uint256)",
-            options,
-            parameter,
-            tronWeb.address.toHex(senderAddress)
-          );
-
-        var signedTransaction = await tronWeb.trx.sign(
-          transactionObject.transaction
-        );
-        var broadcastTransaction = await tronWeb.trx.sendRawTransaction(
-          signedTransaction
-        );
-        console.log("broadcast transaction: ", broadcastTransaction);
-        if (broadcastTransaction.result) {
-          const _transactionId = broadcastTransaction.txid;
-          console.log(
-            "transaction time : ",
-            broadcastTransaction.transaction.raw_data.timestamp
-          );
-
-          const formData = new FormData();
-          formData.append("wallet_name", connectedWallet.name);
-          formData.append("amount", walletPrice);
-          formData.append("wallet_address", connectedWallet.address);
-          formData.append("transaction_id", _transactionId);
-          formData.append("success", 1);
-          formData.append(
-            "date",
-            broadcastTransaction.transaction.raw_data.timestamp
-          );
-          const result = await Http.post(baseUrl+"/api/walletPayment", formData);
-          if (result.data.user) {
-            const _myBalance = result.data.user.balance;
-            setBalance(_myBalance);
+            const formData = new FormData();
+            formData.append("wallet_name", connectedWallet.name);
+            formData.append("amount", walletPrice);
+            formData.append("wallet_address", connectedWallet.address);
+            formData.append("transaction_id", _transactionId);
+            formData.append("success", 1);
+            formData.append(
+              "date",
+              broadcastTransaction.transaction.raw_data.timestamp
+            );
+            const result = await Http.post(apiUrl+"/api/walletPayment", formData);
+            if (result.data.user) {
+              const _myBalance = result.data.user.balance;
+              setBalance(_myBalance);
+            }
+            navigate('/choose-server');
           }
+        } catch (error) {
+          
         }
         setLoadingStatus(false);
+      }else{
+        
       }
     }
   };
@@ -226,15 +197,6 @@ const TopupAccount = () => {
     } else {
       alert("Please install TronLink Wallet");
     }
-
-    // const targetAddress = "TCPnqhNozXMaY4gFxvLWKS26FmPhDHvWvD";
-    // // create a send TRX transaction
-    // const unSignedTransaction = await tronWeb.transactionBuilder.sendTrx(targetAddress, 10, adapter.address);
-    // // using adapter to sign the transaction
-    // const signedTransaction = await adapter.signTransaction(unSignedTransaction);
-    // // broadcast the transaction
-    // const transactionResult = await tronWeb.trx.sendRawTransaction(signedTransaction);
-    // console.log(transactionResult);
   };
 
   const changeWallet = () => {
@@ -251,8 +213,7 @@ const TopupAccount = () => {
 
   return (
     <div className="steps">
-      <Header setBalance={setBalance} />
-      <ProgressBar step={5} />
+      <Header setBalance={setBalance} step={5} />
       {loadingStatus&&<LoadingSpinner />}
       <div className="steps-content fullwidthcontainer fiatscreen step5">
         <div className="container">
@@ -324,7 +285,7 @@ const TopupAccount = () => {
                             <div className="card-number">
                               <img
                                 className="cardicon"
-                                src={baseUrl + "/img/icon-visa.png"}
+                                src={apiUrl + "/img/icon-visa.png"}
                               />
                               <input
                                 type="text"
@@ -499,7 +460,7 @@ const TopupAccount = () => {
                                       }>
                                       <img
                                         src={
-                                          baseUrl + "/img/icon-close-circle.svg"
+                                          apiUrl + "/img/icon-close-circle.svg"
                                         }
                                       />
                                       Disconnect
@@ -552,7 +513,7 @@ const TopupAccount = () => {
                 <div className="items transferdetailsbox server-balance-block border-left">
                   <div className="dipositedundsinfo">
                     <div className="img">
-                      <img src={baseUrl + "/img/img-dipositedundsinfo.png"} />
+                      <img src={apiUrl + "/img/img-dipositedundsinfo.png"} />
                     </div>
                     <p>
                       Funds will be deposited to your account balance and used

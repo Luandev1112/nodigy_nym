@@ -1,24 +1,25 @@
 import React, {useEffect, useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Http from "../utils/Http";
 import { Form, Dropdown } from 'react-bootstrap';
 import flagList from "../data/wallet/flagList.json";
 import coreTypes from "../data/wallet/coreTypes.json";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
 import LoadingSpinner from '../common/LoadingSpinner';
-import { FallbackFragment } from 'ethers';
+import ErrorModal from '../elements/ErrorModal';
+import { apiUrl } from '../utils/script';
 
 const ChooseServer = () => {
+    const { state } = useLocation();
     const [selectedId, setSelectedId] = useState(0);
     const [limitBalance, setLimitBalance] = useState(0);
     const [selectedServer, setSelectedServer] = useState(null);
     const [servers, setServers] = useState([]);
     const [project, setProject] = useState(null);
-    const [onbordingFee, setOnbordingFee] = useState(20);
+    const [onbordingFee, setOnbordingFee] = useState(5);
     const [monthlyPrice, setMonthlyPrice] = useState(0);
-    const [dataCenters, setDataCenter] = useState(['Hartznerf']);
+    const [dataCenters, setDataCenter] = useState(['Hetzner']);
     const [selectedDataCenter, setSelectedDataCenter] = useState(0);
     const [selectedLocationIndex, setSelectedLocationIndex] = useState(-1);
     const [balance, setBalance] = useState(0);
@@ -32,8 +33,10 @@ const ChooseServer = () => {
     const [loadingStatus, setLoadingStatus] = useState(false);
     const [balanceStatus, setBalanceStatus] = useState(false);
     const [gasFee, setGasFee] = useState(2);
+    const [paymentBtnText, setPaymentBtnText] = useState("Complete Payment");
+    const [errorStatus, setErrorStatus] = useState(false);
+    const [errorContent, setErrorContent] = useState("");
 
-    const baseURL = "https://nodigy.com";
     const navigate = useNavigate();
 
     const selectServer = (idx) => {
@@ -41,17 +44,17 @@ const ChooseServer = () => {
         setSelectedServer(_selectedServer);
         setSelectedId(_selectedServer.id);
         const _price = Number((_selectedServer.price_monthly_gross * exchangeRate).toFixed(2));
-
         const _limitBalance = getServerSelectionFee(_price);
 
         let _balanceStatus = false;
         if(_price == 0) {
             _balanceStatus = false;
         }else{
+            _balanceStatus = true;
             if(balance >= _limitBalance) {
-                _balanceStatus = true;
+                setPaymentBtnText("Complete Payment");
             } else{
-                _balanceStatus = false;
+                setPaymentBtnText("Top-up account");
             }
         }
         setBalanceStatus(_balanceStatus);
@@ -74,7 +77,7 @@ const ChooseServer = () => {
     } 
 
     const gotoTopupPage = async() => {
-        if(balance > limitBalance){
+        if(balance >= limitBalance){
             // payment function here
             if(selectedServer) {
                 try {
@@ -82,7 +85,7 @@ const ChooseServer = () => {
                     let formData = new FormData();
                     formData.append('server_id', selectedServer.id);
                     formData.append('price', limitBalance);
-                    const result = await Http.post(baseURL + '/api/purchaseServer', formData);
+                    const result = await Http.post(apiUrl + '/api/purchaseServer', formData);
 
                     const userBalance = result.data.user_balance;
                     setBalance(userBalance);
@@ -100,7 +103,7 @@ const ChooseServer = () => {
                     serverData.append('location_id', _locationId);
                     serverData.append('server_type_id', _serverTypeId);
                     serverData.append('data_center_type', _serverType);
-                    const createServerResult = await Http.post(baseURL + '/api/wizard-setting-nym/create-server', serverData);
+                    const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
                     console.log("Create server result", createServerResult);
 
                     const _createdServer = createServerResult.data.data.server;
@@ -111,7 +114,7 @@ const ChooseServer = () => {
                         formData = new FormData();
                         formData.append('server_id', _serverId);
                         formData.append('node_id', _nodeId);
-                        const saveResult = await Http.post(baseURL + '/api/save-server-id', formData);
+                        const saveResult = await Http.post(apiUrl + '/api/save-server-id', formData);
                         if(saveResult.data){
                             navigate('/deposit-success', {
                                 state: {
@@ -136,50 +139,62 @@ const ChooseServer = () => {
     }
 
     const getInitNode = async() => {
-        let _initNode = await Http.get(baseURL+'/api/getInitialNode');
-
-        if(_initNode.data.node && _initNode.data.node.description){
-            navigate('/wallet-installation-success');
-            return;
-        }
-
-        if(_initNode.data.node && _initNode.data.node.server_id){
-            navigate('/wallet-install');
-            return;
+        try {
+            let _initNode = await Http.get(apiUrl+'/api/getInitialNode');
+            if(_initNode.data.node && _initNode.data.node.description){
+                navigate('/wallet-installation-success');
+                return;
+            }
+            if(_initNode.data.node && _initNode.data.node.server_id){
+                navigate('/wallet-install');
+                return;
+            }   
+        } catch (error) {
+            setErrorStatus(true);
+            setErrorContent("There is error in get inital node");
         }
     }
 
 
     const getEuroRate = async() => {
-        const _exchangeRate = await Http.get(baseURL + '/api/convert-price/get-exchange-rate/euro');
-        setExchangeRate(_exchangeRate.data.data.rate);
+        try {
+            const _exchangeRate = await Http.get(apiUrl + '/api/convert-price/get-exchange-rate/euro');
+            setExchangeRate(_exchangeRate.data.data.rate);   
+        } catch (error) {
+            setErrorStatus(true);
+            setErrorContent("There is error in geting rate");
+        }
     }
 
     const getServers = async() => {
         const project_id = 2;
-        const _result = await Http.get(baseURL + '/api/datacenter/country?project_id='+project_id);
-        const _serverLocations = _result.data.data;
-        setServerLocations(_serverLocations);
-
-        let _locations = [];
-        for(let i = 0; i < _serverLocations.length; i++)
-        {
-            const _serverLoc = _serverLocations[i];
-            let _loc = {
-                city: _serverLoc.city,
-                country: flagList[_serverLoc.country].country,
-                flag: flagList[_serverLoc.country].flag,
-                name: _serverLoc.country,
-                id: _serverLoc.id
+        try {
+            const _result = await Http.get(apiUrl + '/api/datacenter/country?project_id='+project_id);
+            const _serverLocations = _result.data.data;
+            setServerLocations(_serverLocations);   
+            let _locations = [];
+            for(let i = 0; i < _serverLocations.length; i++)
+            {
+                const _serverLoc = _serverLocations[i];
+                let _loc = {
+                    city: _serverLoc.city,
+                    country: flagList[_serverLoc.country].country,
+                    flag: flagList[_serverLoc.country].flag,
+                    name: _serverLoc.country,
+                    id: _serverLoc.id
+                }
+                _locations.push(_loc);
             }
-            _locations.push(_loc);
+            setLocations(_locations);
+            setSelectedLocationIndex(0);
+            const _serverLocation = _serverLocations[0];
+            console.log("Server Locations: ", _serverLocations);
+            const _servers = _serverLocation.server;
+            setServers(_servers);
+        } catch (error) {
+            setErrorStatus(true);
+            setErrorContent("There is error in getting servers");
         }
-        setLocations(_locations);
-        setSelectedLocationIndex(0);
-        const _serverLocation = _serverLocations[0];
-        console.log("Server Locations: ", _serverLocations);
-        const _servers = _serverLocation.server;
-        setServers(_servers);
     }
 
 
@@ -206,8 +221,7 @@ const ChooseServer = () => {
             loadingStatus ? 
             <LoadingSpinner /> : 
             <div className="steps">
-                <Header setBalance={setBalance} myBalance={balance} />
-                <ProgressBar step={3} />
+                <Header setBalance={setBalance} myBalance={balance} step={3} />
                 <div className="steps-content fullwidthcontainer fiatscreen step5">
                     <div className="container">
                         <div className="row">
@@ -225,18 +239,20 @@ const ChooseServer = () => {
                                                         <th>VCPUS</th>
                                                         <th>RAM</th>
                                                         <th>SSD</th>
+                                                        <th>Price/m</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     { servers.length > 0 &&
                                                         servers.map((server, i) => {
                                                             return (
-                                                                <tr key={i} onClick={()=>selectServer(i)} className={selectedId==server.id?"selected":""}>
+                                                                <tr role="button" key={i} onClick={()=>selectServer(i)} className={selectedId==server.id?"selected":""}>
                                                                     <td className="graytext"> { i+1 }</td>
                                                                     <td>{server.location}</td>
-                                                                    <td><span className="vcpus"><img src={baseURL + "/img/icon-vspus.svg"} /> {server.cores + " core " + coreTypes[server.type-1].name}</span></td>
+                                                                    <td><span className="vcpus"><img src={apiUrl + "/img/icon-vspus.svg"} /> {server.cores + " core " + coreTypes[server.type-1].name}</span></td>
                                                                     <td className="graytext"> {server.memory} GB</td>
-                                                                    <td><span><img src={baseURL + "/img/icon-storage.svg"} /> {server.disk+" GB"}</span></td>
+                                                                    <td><span><img src={apiUrl + "/img/icon-storage.svg"} /> {server.disk+" GB"}</span></td>
+                                                                    <td><span>{Number((server.price_monthly_gross * exchangeRate).toFixed(2))} USDT</span></td>
                                                                 </tr>
                                                             );
                                                         })
@@ -246,7 +262,7 @@ const ChooseServer = () => {
                                         </div>
 
                                         <div className="form-group mt-4">
-                                            <label>Choose Server Configuration</label>
+                                            <label>Choose Hosting Provider</label>
                                             <Dropdown className="dropdown-currency">
                                                 <Dropdown.Toggle variant="default" id="">
                                                     {
@@ -283,7 +299,7 @@ const ChooseServer = () => {
                                                 {
                                                     selectedLocationIndex >= 0 ?
                                                     <React.Fragment>
-                                                        <img src={baseURL+"/images/flags/" + locations[selectedLocationIndex].flag} className="rounded-circle" /> {locations[selectedLocationIndex].city + ", " + locations[selectedLocationIndex].country}
+                                                        <img src={apiUrl+"/images/flags/" + locations[selectedLocationIndex].flag} className="rounded-circle" /> {locations[selectedLocationIndex].city + ", " + locations[selectedLocationIndex].country}
                                                         <span className="caret"></span>
                                                     </React.Fragment> :
                                                     <React.Fragment>
@@ -298,7 +314,7 @@ const ChooseServer = () => {
                                                     locations.length > 0 && locations.map((location, i) => {
                                                         return(
                                                             <li key={i}>
-                                                                <Dropdown.Item onClick={()=>selectLocation(i)}><img src={baseURL+"/images/flags/" + location.flag} className="rounded-circle" /> { location.city + ", " + location.country }</Dropdown.Item>
+                                                                <Dropdown.Item onClick={()=>selectLocation(i)}><img src={apiUrl+"/images/flags/" + location.flag} className="rounded-circle" /> { location.city + ", " + location.country }</Dropdown.Item>
                                                             </li>
                                                         )
                                                     })
@@ -307,7 +323,10 @@ const ChooseServer = () => {
                                             </Dropdown>
                                         </div>
 
-                                        <div className="blueboxtext"><p>Minimum required server configuration means fewer rewards, but also lower monthly payments. The maximized configuration will increase the charge, but you'll also get from validating the most. Recommended parameters option exists to balance things out.</p></div>
+                                        <div className="blueboxtext">
+                                            <p>Choose Hosting provider and a country where your node will be located.</p>
+                                            <p>For NYM nodes minimal server configuration works great. We recommend to choose the cheapest server configuration for the chosen country.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -317,7 +336,7 @@ const ChooseServer = () => {
                                         <div className="title">My Balance <span>{balance} $USDT</span></div>
                                         <h4>Payment details</h4>
                                         <div className="row">
-                                            <label className="col-sm-8">Server Monthly Payment</label>
+                                            <label className="col-sm-8">Server Current Month Payment</label>
                                             <p className="col-sm-4">{monthlyPrice} $USDT</p>
                                         </div>
                                         <div className="row">
@@ -339,7 +358,7 @@ const ChooseServer = () => {
                                         }
                                         
                                         <div className="btn-container">
-                                            <a onClick={()=>gotoTopupPage()} className={balanceStatus?"btn btn-new btn-primary":"btn btn-gray"}>{balance >= limitBalance?"Complete Payment":"Top-up account"}</a>
+                                            <a onClick={()=>gotoTopupPage()} className={balanceStatus?"btn btn-new btn-primary":"btn btn-gray"}>{paymentBtnText}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -353,6 +372,7 @@ const ChooseServer = () => {
                         </div>
                     </div>
                 </div>
+                <ErrorModal errorContent={errorContent} status={errorStatus} />
                 <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
             </div>
         }

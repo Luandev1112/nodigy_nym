@@ -11,25 +11,10 @@ import WalletBond from './pages/WalletBond';
 import NodeSuccess from './pages/NodeSuccess';
 import Stake from './pages/Stake';
 import StakeSuccess from './pages/StakeSuccess';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import First from './pages/First';
 const App = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [url, setUrl] = useState('');
-    // const checkUser = async() => {
-    //     try{
-    //         const res = await Http.get('/admin/getuser');
-    //         setIsLogin(true);
-    //     }catch(err){
-    //         const statusCode = err.response.status;
-    //         if(statusCode == 401 || statusCode == 405)
-    //         {
-    //             window.location.href = "/logout";
-    //         }
-    //     }
-    // }
-
     const setPath = (path) => {
         setUrl(path);
     }
@@ -44,8 +29,6 @@ const App = () => {
                 <Route path="/"  element={<First />} />
                 <Route path="/choose-server"  element={<ChooseServer />} />
                 <Route path='/top-up-account' element={<TopupAccount />} />
-                <Route path='/login' element={<Login />} />
-                <Route path='/register' element={<Register />} />
                 <Route path='/deposit-success' element={<DepositSuccess />} />
                 <Route path='/wallet-install' element={<WalletInstall />} />
                 <Route path='/wallet-installation-success' element={<WalletSuccess />} />
