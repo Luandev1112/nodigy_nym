@@ -1,5 +1,5 @@
-// const apiUrl = "https://nodigy.com";
-const apiUrl = "http://nodigy.test";
+const apiUrl = "https://nodigy.com";
+// const apiUrl = "http://nodigy.test";
 const sendTrc20 = async(amount, walletAddress) => {
     // const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
     // const receiverAddress = "TCPnqhNozXMaY4gFxvLWKS26FmPhDHvWvD";
@@ -61,4 +61,13 @@ const shortenAddress = (address) => {
     return newString;
 }
 
-export {apiUrl, sendTrc20, shortenAddressString, shortenAddress}
+const validNumber = (number) => {
+    let status = false;
+    const re = /^-?\d+(?:[.,]\d*?)?$/;
+    if (number === '' || re.test(number)) {
+       status = true;
+    }
+    return status;
+}
+
+export {apiUrl, sendTrc20, shortenAddressString, shortenAddress, validNumber}

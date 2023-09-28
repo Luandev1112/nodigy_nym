@@ -146,7 +146,7 @@ const ChooseServer = () => {
                 return;
             }
             if(_initNode.data.node && _initNode.data.node.server_id){
-                navigate('/wallet-install');
+                navigate('/wallet-identification');
                 return;
             }   
         } catch (error) {

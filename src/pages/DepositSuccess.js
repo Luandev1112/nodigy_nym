@@ -5,19 +5,22 @@ import Header from '../common/Header';
 import Footer from '../common/Footer';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
 import CopyImage from '../assets/images/icon-copy.svg';
+import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
+import { apiUrl } from '../utils/script';
 const DepositSuccess = () => {
     const { state } = useLocation();
     const [hashId, setHashId] = useState(state?state.hashId:null);
     const [balanceType, setBalanceType] = useState(state?state.balanceType:null);
     const [amount, setAmount] = useState(null);
     const [balance, setBalance] = useState(0);
-    const baseURL = 'https://nodigy.com';
+    const [copyContent, setCopyContent] = useState('');
+
     const navigate = useNavigate();
 
     const gotoNextStep = () => {
         switch(balanceType) {
             case 'server':
-                navigate('/wallet-install');
+                navigate('/wallet-identification');
             break;
             case 'node-install':
                 
@@ -25,9 +28,17 @@ const DepositSuccess = () => {
         }
     }
     const getTransaction = async() => {
-        const res = await Http.get(baseURL+'/api/getTransaction/'+hashId);
+        const res = await Http.get(apiUrl+'/api/getTransaction/'+hashId);
         setAmount(res.data.amount);
     }
+
+    const copyLink = async(address, term) => {
+        if(address != null && address != "") {
+            setCopyContent(term);
+            await navigator.clipboard.writeText(address);
+        }
+    }
+
 
     useEffect(()=>{
         getTransaction();
@@ -35,7 +46,7 @@ const DepositSuccess = () => {
     return (
         amount &&
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={5} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">
@@ -53,17 +64,17 @@ const DepositSuccess = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td>Payment ID:</td>
-                                                        <td className="text-right"><span className="whitetext">{hashId}</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-right"><span className="whitetext">{hashId}</span><a onClick={()=>copyLink(hashId, 'payment_id')}> <img src={copyContent=='payment_id'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Amount</td>
-                                                        <td className="text-right"><span className="whitetext">{amount} USDT</span><a href="#"> <img src={CopyImage} /></a></td>
+                                                        <td className="text-right"><span className="whitetext">{amount} USDT</span><a onClick={()=>copyLink(amount, 'amount')}> <img src={copyContent=='amount'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                         <div className="btn-container">
-                                            <a href="#" className="btn btn-gray">Download PDF</a>
+                                            <a className="btn btn-gray btn-new btn-commingsoon">Download PDF</a>
                                             <a onClick={()=>gotoNextStep()} className="btn btn-primary">Next</a>
                                         </div>
                                     </div>

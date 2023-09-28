@@ -5,7 +5,6 @@ import CopyImage from "../assets/images/icon-copy.svg";
 import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
 import { apiUrl, shortenAddressString } from "../utils/script";
 
 const ChooseServer = () => {
@@ -32,7 +31,7 @@ const ChooseServer = () => {
     const [step, setStep] = useState(5);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
-    const [prevUrl, setPrevUrl] = useState('/wallet-install'); 
+    const [prevUrl, setPrevUrl] = useState('/wallet-identification'); 
     const [copyContent, setCopyContent] = useState('');
     const [submitStatus, setSubmitStatus] = useState(false);
     const [submitBtnText, setSubmitBtnText] = useState("Submit");
@@ -195,7 +194,7 @@ const ChooseServer = () => {
     }, [intervalSecond]);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={6} />
             <div className="steps-content fullwidthcontainer fiatscreen step5">
                 <div className="container">
                     <div className="row">
@@ -262,15 +261,15 @@ const ChooseServer = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td className="td-name">Use this wallet:</td>
-                                                        <td className="text-end"><span>{shortenAddressString(walletAddress, 26)}</span><a onClick={()=>copyLink(walletAddress, 'wallet')}> <img src={copyContent=='wallet'?CheckCircleImage:CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(walletAddress, 22)}</span><a onClick={()=>copyLink(walletAddress, 'wallet')}> <img src={copyContent=='wallet'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Identity Key: </td>
-                                                        <td className="text-end"><span>{shortenAddressString(idKey, 26)}</span><a onClick={()=>copyLink(idKey, 'idkey')}> <img src={copyContent=='idkey'?CheckCircleImage:CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(idKey, 22)}</span><a onClick={()=>copyLink(idKey, 'idkey')}> <img src={copyContent=='idkey'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Sphinx Key:</td>
-                                                        <td className="text-end"><span>{shortenAddressString(sphinxKey, 26)}</span><a onClick={()=>copyLink(sphinxKey, 'spkey')}> <img src={copyContent=='spkey'?CheckCircleImage:CopyImage} /></a></td>
+                                                        <td className="text-end"><span>{shortenAddressString(sphinxKey, 22)}</span><a onClick={()=>copyLink(sphinxKey, 'spkey')}> <img src={copyContent=='spkey'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td className="td-name">Host (bind address): </td>
@@ -320,7 +319,7 @@ const ChooseServer = () => {
                                             </table>
                                         </div>
 
-                                        <div className="btn-container"><a onClick={gotoNextPage} className={"btn btn-primary width100 "+finishClass}>Finish node installation</a></div>
+                                        <div className="btn-container"><a onClick={gotoNextPage} className={"btn btn-primary width100 "+finishClass}>Finish Node Installation</a></div>
                                     </div>  
                                 </div>
                             </div>

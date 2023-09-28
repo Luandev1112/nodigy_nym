@@ -295,7 +295,9 @@
     background-color: var(--color-white) !important;
 }
 
-
+.width-180 {
+    width: 180px;
+}
 
 
 /* Radius */
@@ -457,8 +459,11 @@ h2 {
 	margin-bottom: 30px;
 }
 
-a:hover {
-	text-decoration: none;
+a {
+    text-decoration: none;
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 ul {
@@ -477,10 +482,9 @@ label {
 	font-weight: 400;
 	display: block;
 	font-size: 13px;
-}
-
-lable span {
-	color: #333;
+    span {
+        color: #333;
+    }
 }
 
 .btn-primary {
@@ -630,10 +634,6 @@ lable span {
 
 .btn-default {
 	font-size: 0;
-}
-
-a {
-	text-decoration: none;
 }
 
 button.close {
