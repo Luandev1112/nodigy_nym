@@ -42,7 +42,7 @@ const Stake = () => {
                                             <p>Recommended tokens amount: 30 000 $NYM or more</p>
                                             <p>Gas fee paid in: $NYM</p>
                                             <p>$NYM tokens are available for purchase on Kraken, Mexc, OKX, or Huobi exchanges.</p>
-                                            <p>Follow our text <a href="https://docs.nodigy.com/welcome/guides-and-instructions/wallet-installation-guides/nym-wallet" target="_blank">guide</a>.</p>
+                                            <p>Follow our text <a href="https://docs.nodigy.com/welcome/guides-and-instructions/wallet-installation-guides/nym-wallet#top-up-your-account" target="_blank">guide</a>.</p>
                                         </div>
 
                                         <p>You can increase the staked tokens amount by bonding or delegating them into your node inside your NYM wallet. Read more <a href="https://docs.nodigy.com/welcome/guides-and-instructions/staking-and-rewards/nym-bonding-delegating-and-rewards" className="green_text" target="_blank">here</a>.</p>

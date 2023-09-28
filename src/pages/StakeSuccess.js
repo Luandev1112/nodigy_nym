@@ -21,7 +21,7 @@ const StakeSuccess = () => {
     return (
         <div className="steps">
             <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={3} />
+            <ProgressBar step={8} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">

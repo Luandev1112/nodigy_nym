@@ -3,6 +3,8 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import InstallImage from '../assets/images/icon-installation.png';
 import CopyImage from '../assets/images/icon-copy.svg';
 import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
+import IconExportImage from "../assets/images/icon-export.svg";
+import Header from '../common/Header';
 import Footer from '../common/Footer';
 import { apiUrl, shortenAddress, shortenAddressString } from '../utils/script';
 import Http from "../utils/Http";
@@ -10,6 +12,7 @@ import flagList from "../data/wallet/flagList.json";
 import NymWallet from '../elements/NymWallet';
 const NodeSuccess = () => {
     const { state } = useLocation();
+    const [balance, setBalance] = useState(0);
     const [nodeId, setNodeId] = useState(state?state.nodeId:null);
     const [projectId, setProjectId] = useState(state?state.projectId:null);
     const [step, setStep] = useState(7);
@@ -77,6 +80,7 @@ const NodeSuccess = () => {
     }, []);
     return (
         <div className="steps">
+            <Header setBalance={setBalance} myBalance={balance} step={6} />
             <div className="steps-content nodeinstallation installation">
                 <div className="container">
                     <div className="row">
@@ -97,14 +101,14 @@ const NodeSuccess = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td>Identity Key:</td>
-                                                        <td><span>{idKey}</span><a onClick={()=>copyLink(idKey, 'idkey')}> <img src={copyContent=='idkey'?CheckCircleImage:CopyImage} /></a></td>
+                                                        <td><span>{shortenAddressString(idKey, 36)}</span><a onClick={()=>copyLink(idKey, 'idkey')}> <img src={copyContent=='idkey'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Sphinx Key: </td>
-                                                        <td><span>{sphinxKey}</span><a onClick={()=>copyLink(sphinxKey, 'sphinxKey')}> <img src={copyContent=='sphinxKey'?CheckCircleImage:CopyImage} /></a></td>
+                                                        <td><span>{shortenAddressString(sphinxKey, 36)}</span><a onClick={()=>copyLink(sphinxKey, 'sphinxKey')}> <img src={copyContent=='sphinxKey'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>Host (bind address):</td>
+                                                        <td className='width-180'>Host (bind address):</td>
                                                         <td><span>{host}</span><a onClick={()=>copyLink(host, 'host')}> <img src={copyContent=='host'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
@@ -117,7 +121,7 @@ const NodeSuccess = () => {
                                                     </tr>
                                                     <tr>
                                                         <td>Explorer:</td>
-                                                        <td colSpan="2" className="text-center"><a href={"https://explorer.nymtech.net/network-components/mixnode/"+nodeId} className="fullurl">{"https://explorer.nymtech.net/network-components/mixnode/"+nodeId}</a></td>
+                                                        <td className="text-end"><a href={"https://explorer.nymtech.net/network-components/mixnode/"+nodeId} className="fullurl">{shortenAddressString("https://explorer.nymtech.net/network-components/mixnode/"+nodeId, 46)} <img src={IconExportImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Location:</td>

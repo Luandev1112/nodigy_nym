@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import Http from "../utils/Http";
 import NodeImage from "../assets/images/nodes-logo-icon1.png";
 import EditImage from "../assets/images/icon-edit-2.svg";
@@ -7,30 +8,41 @@ import ArrowRightImage from "../assets/images/arrow-right.svg";
 
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
-import { apiUrl } from '../utils/script';
+import { apiUrl, shortenAddress } from '../utils/script';
 
 const WalletInstall = () => {
-    const [node, selectedNode] = useState(null);
     const [walletAddress, setWalletAddress] = useState('');
     const [balance, setBalance] = useState(0);
     const [walletStatus, setWalletStatus] = useState(true);
     const [step, setStep] = useState(6);
+    const [minStake, setMinStake] = useState(0);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('/wallet-installation-success');
     const [prevUrl, setPrevUrl] = useState('/choose-server'); 
+    const [errMsg, setErrorMsg] = useState('');
+    const navigate = useNavigate();
 
-    const shortenAddress = (address) => {
-        let newString = address.substr(0 , 5) + "..." + address.substr(-5, 5);
-        return newString;
+    const gotoGuidePage = () => {
+        navigate('/wallet-install-guide');
     }
 
     const handleChange = (e) => {
         e.preventDefault();
+        setWalletStatus(true);
         const name = e.target.name;
         const value = e.target.value;
         setWalletAddress(value);
+        handleErrorMemssage(false, minStake);
     } 
+
+    const handleErrorMemssage = (errorStatus, _minStake) => {
+        if(errorStatus) {
+            setErrorMsg('Incorrect wallet address. Please try again');
+        }else {
+            let _msgStr = `Please make sure that your wallet has a balance at least ${_minStake} NYM tokens - a minimum, required for node installation`;
+            setErrorMsg(_msgStr);
+        }
+    }
 
     const handleStep = async() => {
         let _walletStatus = false;
@@ -43,19 +55,33 @@ const WalletInstall = () => {
             console.log("result : ", result);
             _walletStatus = true;
             setWalletStatus(true);
+            handleErrorMemssage(false, minStake);
         }else{
             _walletStatus = false;
             setWalletStatus(false);
+            handleErrorMemssage(true, minStake);
         }
         return _walletStatus;
     }
 
+    const getNymSettings = async() => {
+        const projectId = 2;
+        try {
+            const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+projectId);
+            const _minStake = result.data.data.wizard_setting.min_stake*100/100;
+            setMinStake(_minStake);
+            handleErrorMemssage(false, _minStake);
+        } catch (error) {
+            console.log("There is errro in getting the setting data");
+        }
+    }
+
     useEffect(() => {
-        // installnode();
+        getNymSettings();
     }, []);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={6} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">
@@ -64,12 +90,12 @@ const WalletInstall = () => {
                                 <div className="items border-left border-down">
                                     <div className="p30">
                                         <div className="title">Wallet identification</div>
-                                        <p className="graytext mb-1">Your node will need a Web3 wallet as a source of tokens to stake and as an address to receive rewards. Choose one of the listed options, connect the wallet, and sign a message to prove your ownership.</p>
-                                        <p className="graytext">If the connection fails, enter your wallet address in the field below. Make sure to enter it correctly!</p>
+                                        <p className="graytext mb-1">Your node needs a WEB3 wallet as a source of tokens to stake and as an address to receive rewards. For NYM node only NYM wallet is available.</p>
+                                        <p className="graytext">Please copy your NYM wallet public address and paste in the field below.</p>
                                         
                                         <div className="title">
                                             <span className={walletStatus?"install-title":"install-title font-danger"} >NYM Wallet</span>
-                                            <a className="install-button" role="button">Install wallet <img src={ArrowRightImage} /></a>
+                                            <a className="install-button" role="button" onClick={()=>gotoGuidePage()}>Install wallet <img src={ArrowRightImage} /></a>
                                         </div>
                                         <div className="n_r_form_field">
                                             <div className="form-group">
@@ -77,7 +103,7 @@ const WalletInstall = () => {
                                                 <input type="text" className={walletStatus?"form-control":"form-control border-danger"} name="wallet_address" value={walletAddress} onChange={handleChange} />
                                             </div>
                                         </div> 
-                                        <div className={walletStatus?"insufficientbalance":"insufficientbalance background-danger"}>Please make sure that your wallet has a balance at least 101 NYM tokens - a minimum, required for node installation</div>
+                                        <div className={walletStatus?"insufficientbalance":"insufficientbalance background-danger"}>{errMsg}</div>
                                     </div>
                                 </div>
                             </div>

@@ -17,7 +17,7 @@ const NodeInstall = () => {
     const [percentage, setPercetage] = useState(0);
     const [node, setNode] = useState(null);
     const [installTitle, setInstallTitle] = useState("Installation in progress");
-    const [installDescription, setInstallDescription] = useState('The installation process may take from 2 hours to 3 days');
+    const [installDescription, setInstallDescription] = useState('The installation process may take some time');
     const navigate = useNavigate();
 
     const getWalletAddress = async() => {
@@ -92,7 +92,7 @@ const NodeInstall = () => {
     }, [intervalSecond]);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={7} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">
@@ -156,7 +156,7 @@ const NodeInstall = () => {
                                                 <a href="#"><img src={EditImage} /></a>
                                             </div>
                                         </div>
-                                        <p className="graytext">The installation process may take from 2 hours to 3 days. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href="">personal area.</a></p>
+                                        <p className="graytext">The installation process may take up to an hour. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href="https://nodigy.com/admin/node/nym">personal area.</a></p>
                                     </div>
                                 </div>
                             </div>

@@ -5,6 +5,7 @@ import ChooseServer from "./pages/ChooseServer";
 import TopupAccount from './pages/TopupAccount';
 import DepositSuccess from './pages/DepositSuccess';
 import WalletInstall from './pages/WalletInstall';
+import InstallGuide from './pages/InstallGuide';
 import WalletSuccess from './pages/WalletSuccess';
 import NodeInstall from './pages/NodeInstall';
 import WalletBond from './pages/WalletBond';
@@ -30,7 +31,8 @@ const App = () => {
                 <Route path="/choose-server"  element={<ChooseServer />} />
                 <Route path='/top-up-account' element={<TopupAccount />} />
                 <Route path='/deposit-success' element={<DepositSuccess />} />
-                <Route path='/wallet-install' element={<WalletInstall />} />
+                <Route path='/wallet-identification' element={<WalletInstall />} />
+                <Route path='/wallet-install-guide' element={<InstallGuide />} />
                 <Route path='/wallet-installation-success' element={<WalletSuccess />} />
                 <Route path='/node-install' element={<NodeInstall />} />
                 <Route path='/bond-wallet' element={<WalletBond />} />

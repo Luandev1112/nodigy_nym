@@ -6,23 +6,25 @@ import { useNavigate } from 'react-router-dom';
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import LoadingSpinner from "../common/LoadingSpinner";
-import { sendTrc20 } from "../utils/script";
+import { sendTrc20, shortenAddress, validNumber} from "../utils/script";
 import { apiUrl } from "../utils/script";
 
 const TopupAccount = () => {
+  // card variables
   const [cardNumber, setCardNumber] = useState("1234 5678 89012 3456");
   const [cardHolder, setCardHolder] = useState("JOHN DOE");
   const [expirationDate, setExpirationDate] = useState("02 / 2024");
   const [cvv, setCVV] = useState("111");
   const [amountFrom, setAmountFrom] = useState("301 000 000");
   const [amountTo, setAmountTo] = useState(29.01);
-  const [tabType, setTabType] = useState("card");
+  // card variables end
+  
+  const [tabType, setTabType] = useState("crypto");
   const [walletList, setWalletList] = useState([{wallet_logo: 'wallet_img_64aea07746f67_1689165943.png', supp_wallet_name: 'TronLink'}]);
   const [selectedWallet, setSelectedWallet] = useState({wallet_logo: 'wallet_img_64aea07746f67_1689165943.png', supp_wallet_name: 'TronLink'});
   const [connectedWallet, setConnectedWallet] = useState(null);
   const [balanceType, setBalanceType] = useState('server');
   const [loadig, setLoading] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState(false);
   const [walletPrice, setWalletPrice] = useState(0);
   const [walletInstalled, setWalletInstalled] = useState(false);
   const [maxToken, setMaxToken] = useState(0);
@@ -30,11 +32,14 @@ const TopupAccount = () => {
   const [balance, setBalance] = useState(0);
   const [error, setError] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
-
   const [step, setStep] = useState(4);
   const [subStep, setSubStep] = useState(0);
   const [nextUrl, setNextUrl] = useState('');
-  const [prevUrl, setPrevUrl] = useState('/choose-server'); 
+  const [prevUrl, setPrevUrl] = useState('/choose-server');
+  const [connectBtnActive, setConnectBtnActive] = useState(true);
+  const [depositBtnActive, setDepositBtnActive] = useState(false);
+  
+  const commingSoon = true;
 
   // TronLink transaction constant settings
   // const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
@@ -66,7 +71,16 @@ const TopupAccount = () => {
         setAmountTo(value);
         break;
       case "wallet_price":
-        setWalletPrice(value);
+        if(validNumber(value)) {
+          setWalletPrice(value);
+          if(maxToken > 0 && value*1 < maxToken && value != '') {
+            setDepositBtnActive(true);
+          }else{
+            setDepositBtnActive(false);
+          }
+        }else{
+          setDepositBtnActive(false);
+        }
         break;
     }
   };
@@ -83,7 +97,9 @@ const TopupAccount = () => {
           // setSubStep('deposit-success');
           // setStep(5);
         } else if (tabType == "crypto") {
-          await paymentByWallet();
+          if(depositBtnActive) {
+            await paymentByWallet(); 
+          }
         }
 
         break;
@@ -110,7 +126,7 @@ const TopupAccount = () => {
   };
 
   const paymentByWallet = async () => {
-    if (typeof walletPrice * 1 != "NaN" && walletPrice < maxToken ) {
+    if (walletPrice < maxToken ) {
       if(walletPrice > 0) {
         setLoadingStatus(true);
         try {
@@ -149,25 +165,28 @@ const TopupAccount = () => {
     const walletName = selectedWallet.supp_wallet_name;
     switch (walletName.toLowerCase()) {
       case "tronlink":
-        await connectTron();
+        if(connectBtnActive) {
+          await connectTron();
+        }
         break;
     }
   };
 
-  const shortenAddress = (address) => {
-    let newString = address.substr(0, 5) + "..." + address.substr(-5, 5);
-    return newString;
-  };
-
   const disconnectWallet = (walletName) => {
     setConnectedWallet(null);
+    setConnectBtnActive(true);
+    setMaxToken(0);
+    setWalletPrice(0);
+    setDepositBtnActive(false);
   };
 
   const connectTron = async () => {
-    if (window.tronWeb) {
+    if ( typeof window.tronWeb !== 'undefined' && window.tronWeb) {
+      setWalletInstalled(true);
       const wtronweb = window.tronWeb;
       const adapter = new TronLinkAdapter();
       // connect
+      setLoadingStatus(true);
       await adapter.connect();
       try {
         const message = "Wallet connection";
@@ -180,8 +199,6 @@ const TopupAccount = () => {
             logo: selectedWallet.wallet_logo,
           };
           setConnectedWallet(_connectedWallet);
-          setConnectionStatus(true);
-
           const { abi } = await wtronweb.trx.getContract(contractWalletAddress);
           const usdtContract = wtronweb.contract(
             abi.entrys,
@@ -192,28 +209,31 @@ const TopupAccount = () => {
             .call();
           const walletBalance = Number(balance) / 1000000;
           setMaxToken(walletBalance);
+          setConnectBtnActive(false);
         }
-      } catch (error) {}
+      } catch (error) {
+        setConnectBtnActive(true);
+      }
+      setLoadingStatus(false);
     } else {
-      alert("Please install TronLink Wallet");
+      setWalletInstalled(false);
     }
   };
 
-  const changeWallet = () => {
-    if (typeof window.tronWeb !== 'undefined') {
+  const cehckTronWallet = () => {
+    if ( typeof window.tronWeb !== 'undefined' && window.tronWeb) {
       setWalletInstalled(true);
     } else {
-        setWalletInstalled(false);
+      setWalletInstalled(false);
     }
-  }
-
+  } 
   useEffect(() => {
-    changeWallet();
+    cehckTronWallet();
   }, []);
 
   return (
     <div className="steps">
-      <Header setBalance={setBalance} step={5} />
+      <Header setBalance={setBalance} step={4} />
       {loadingStatus&&<LoadingSpinner />}
       <div className="steps-content fullwidthcontainer fiatscreen step5">
         <div className="container">
@@ -224,6 +244,33 @@ const TopupAccount = () => {
                   <h3>Top-up account</h3>
                   <div className="topuptabs">
                     <ul className="nav nav-tabs" role="tablist">
+                    <li
+                        role="presentation"
+                        className={tabType == "crypto" ? "active" : ""}>
+                        <a
+                          onClick={() => changeTabType("crypto")}
+                          aria-controls="crypto"
+                          role="tab"
+                          data-toggle="tab">
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M29.3334 11.3332C29.3334 15.6798 26.1334 19.2665 21.9734 19.8932V19.8132C21.56 14.6398 17.36 10.4398 12.1467 10.0265H12.1067C12.7334 5.8665 16.32 2.6665 20.6667 2.6665C25.4534 2.6665 29.3334 6.5465 29.3334 11.3332Z"
+                              fill="#ffffff"
+                            />
+                            <path
+                              d="M19.9734 19.9733C19.6401 15.7467 16.2534 12.36 12.0267 12.0267C11.8001 12.0133 11.5601 12 11.3334 12C6.54675 12 2.66675 15.88 2.66675 20.6667C2.66675 25.4533 6.54675 29.3333 11.3334 29.3333C16.1201 29.3333 20.0001 25.4533 20.0001 20.6667C20.0001 20.44 19.9867 20.2 19.9734 19.9733ZM12.5067 21.84L11.3334 24L10.1601 21.84L8.00008 20.6667L10.1601 19.4933L11.3334 17.3333L12.5067 19.4933L14.6667 20.6667L12.5067 21.84Z"
+                              fill="#ffffff"
+                            />
+                          </svg>{" "}
+                          <span>Сrypto</span>
+                        </a>
+                      </li>
+                      {!commingSoon && 
                       <li
                         role="presentation"
                         className={tabType == "card" ? "active" : ""}>
@@ -250,34 +297,138 @@ const TopupAccount = () => {
                           <span>Сard</span>
                         </a>
                       </li>
-                      <li
-                        role="presentation"
-                        className={tabType == "crypto" ? "active" : ""}>
-                        <a
-                          onClick={() => changeTabType("crypto")}
-                          aria-controls="crypto"
-                          role="tab"
-                          data-toggle="tab">
-                          <svg
-                            width="32"
-                            height="32"
-                            viewBox="0 0 32 32"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M29.3334 11.3332C29.3334 15.6798 26.1334 19.2665 21.9734 19.8932V19.8132C21.56 14.6398 17.36 10.4398 12.1467 10.0265H12.1067C12.7334 5.8665 16.32 2.6665 20.6667 2.6665C25.4534 2.6665 29.3334 6.5465 29.3334 11.3332Z"
-                              fill="#ffffff"
-                            />
-                            <path
-                              d="M19.9734 19.9733C19.6401 15.7467 16.2534 12.36 12.0267 12.0267C11.8001 12.0133 11.5601 12 11.3334 12C6.54675 12 2.66675 15.88 2.66675 20.6667C2.66675 25.4533 6.54675 29.3333 11.3334 29.3333C16.1201 29.3333 20.0001 25.4533 20.0001 20.6667C20.0001 20.44 19.9867 20.2 19.9734 19.9733ZM12.5067 21.84L11.3334 24L10.1601 21.84L8.00008 20.6667L10.1601 19.4933L11.3334 17.3333L12.5067 19.4933L14.6667 20.6667L12.5067 21.84Z"
-                              fill="#ffffff"
-                            />
-                          </svg>{" "}
-                          <span>Сrypto</span>
-                        </a>
-                      </li>
+                      }
                     </ul>
                     <div className="tab-content">
+                      {tabType == "crypto" && (
+                        <div role="tabpanel" className="" id="crypto">
+                          <div className="form-group">
+                            <label>Source wallet</label>
+                            <Dropdown className="dropdown-currency">
+                              <Dropdown.Toggle
+                                variant="default"
+                                id="dropdown-currency">
+                                {selectedWallet ? (
+                                  <React.Fragment>
+                                    <img
+                                      src={
+                                        mediaUrl +
+                                        "wallet_logo/" +
+                                        selectedWallet.wallet_logo
+                                      }
+                                    />{" "}
+                                    {selectedWallet.supp_wallet_name}
+                                    {walletInstalled ? (
+                                      ""
+                                    ) : (
+                                      <a className="anchortext mx-3" href="https://chrome.google.com/webstore/detail/tronlink/ibnejdfjmmkpcnlpebklmnkoeoihofec" target="_blank">
+                                        Install wallet
+                                      </a>
+                                    )}
+                                    <span className="caret"></span>
+                                  </React.Fragment>
+                                ) : (
+                                  <React.Fragment>
+                                    <a className="">Please select wallet</a>
+                                    <span className="caret"></span>
+                                  </React.Fragment>
+                                )}
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                {walletList.length > 0 &&
+                                  walletList.map((wallet, i) => {
+                                    return (
+                                      <li key={i}>
+                                        <Dropdown.Item>
+                                          <img
+                                            src={
+                                              mediaUrl +
+                                              "wallet_logo/" +
+                                              wallet.wallet_logo
+                                            }
+                                          />{" "}
+                                          {wallet.supp_wallet_name}
+                                        </Dropdown.Item>
+                                      </li>
+                                    );
+                                  })}
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </div>
+                          <div className="btn-container mb-4">
+                            <button
+                              type="button"
+                              className={connectBtnActive? 'btn btn-new width100 btn-primary' : 'btn btn-new width100 btn-gray'}
+                              onClick={() => walletConnect()}>
+                              Connect
+                            </button>
+                          </div>
+                          
+                          {connectedWallet ? (
+                            <div className="disconnectaccount item border-left">
+                              <div className="icon">
+                                <img
+                                  src={
+                                    mediaUrl +
+                                    "wallet_logo/" +
+                                    connectedWallet.logo
+                                  }
+                                />
+                              </div>
+                              <div className="text">
+                                <p>
+                                  {shortenAddress(connectedWallet.address)}
+                                </p>
+                                <div className="link-disconnect">
+                                  <a
+                                    className="btn-disconect"
+                                    role="button"
+                                    onClick={() =>
+                                      disconnectWallet(connectedWallet.name)
+                                    }>
+                                    <img
+                                      src={
+                                        apiUrl + "/img/icon-close-circle.svg"
+                                      }
+                                    />
+                                    Disconnect
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <React.Fragment> </React.Fragment>
+                          )}
+                          
+                          <div className="n_r_form_field">
+                          {connectedWallet ? (
+                            <p>
+                              {maxToken} $USDT <span>MAX</span>
+                            </p>
+                          ):(
+                            <React.Fragment></React.Fragment>
+                          )}
+                            <div className="form-group">
+                              <span>$USDT</span>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="wallet_price"
+                                onChange={handleChange}
+                                value={walletPrice}
+                              />
+                            </div>
+                          </div>
+                          <div className="btn-container">
+                            <button
+                              onClick={() => handleDeposit()}
+                              type="button"
+                              className={depositBtnActive?"btn btn-new width100 btn-primary": "btn btn-new width100 btn-gray"}>
+                              Deposit
+                            </button>
+                          </div>
+                        </div>
+                      )}
                       {tabType == "card" && (
                         <div role="tabpanel" className="" id="card">
                           <div className="form-group">
@@ -365,135 +516,9 @@ const TopupAccount = () => {
                           </div>
                           <div className="btn-container">
                             {/* <!--input type="button" className="btn btn-primary btn-new width100" value="Deposit" /--> */}
-                            <a
-                              onClick={() => handleDeposit()}
-                              className="btn btn-primary btn-new width100">
+                            <a className="btn btn-primary btn-new width100">
                               Deposit
                             </a>
-                          </div>
-                        </div>
-                      )}
-                      {tabType == "crypto" && (
-                        <div role="tabpanel" className="" id="crypto">
-                          <div className="form-group">
-                            <label>Source wallet</label>
-                            <Dropdown className="dropdown-currency">
-                              <Dropdown.Toggle
-                                variant="default"
-                                id="dropdown-currency">
-                                {selectedWallet ? (
-                                  <React.Fragment>
-                                    <img
-                                      src={
-                                        mediaUrl +
-                                        "wallet_logo/" +
-                                        selectedWallet.wallet_logo
-                                      }
-                                    />{" "}
-                                    {selectedWallet.supp_wallet_name}
-                                    {walletInstalled ? (
-                                      ""
-                                    ) : (
-                                      <a className="anchortext mx-3" href="#">
-                                        Install wallet
-                                      </a>
-                                    )}
-                                    <span className="caret"></span>
-                                  </React.Fragment>
-                                ) : (
-                                  <React.Fragment>
-                                    <a className="">Please select wallet</a>
-                                    <span className="caret"></span>
-                                  </React.Fragment>
-                                )}
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                {walletList.length > 0 &&
-                                  walletList.map((wallet, i) => {
-                                    return (
-                                      <li key={i}>
-                                        <Dropdown.Item>
-                                          <img
-                                            src={
-                                              mediaUrl +
-                                              "wallet_logo/" +
-                                              wallet.wallet_logo
-                                            }
-                                          />{" "}
-                                          {wallet.supp_wallet_name}
-                                        </Dropdown.Item>
-                                      </li>
-                                    );
-                                  })}
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </div>
-                          <div className="btn-container">
-                            <button
-                              type="button"
-                              className="btn btn-primary btn-new btn-gray width100"
-                              onClick={() => walletConnect()}>
-                              Connect
-                            </button>
-                          </div>
-                          <div className="disconnectaccount item border-left">
-                            {connectedWallet ? (
-                              <React.Fragment>
-                                <div className="icon">
-                                  <img
-                                    src={
-                                      mediaUrl +
-                                      "wallet_logo/" +
-                                      connectedWallet.logo
-                                    }
-                                  />
-                                </div>
-                                <div className="text">
-                                  <p>
-                                    {shortenAddress(connectedWallet.address)}
-                                  </p>
-                                  <div className="link-disconnect">
-                                    <a
-                                      className="btn-disconect"
-                                      onClick={() =>
-                                        disconnectWallet(connectedWallet.name)
-                                      }>
-                                      <img
-                                        src={
-                                          apiUrl + "/img/icon-close-circle.svg"
-                                        }
-                                      />
-                                      Disconnect
-                                    </a>
-                                  </div>
-                                </div>
-                              </React.Fragment>
-                            ) : (
-                              <React.Fragment> </React.Fragment>
-                            )}
-                          </div>
-                          <div className="n_r_form_field">
-                            <p>
-                              {maxToken} $USDT <span>MAX</span>
-                            </p>
-                            <div className="form-group">
-                              <span>$USDT</span>
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="wallet_price"
-                                onChange={handleChange}
-                                value={walletPrice}
-                              />
-                            </div>
-                          </div>
-                          <div className="btn-container">
-                            <button
-                              onClick={() => handleDeposit()}
-                              type="button"
-                              className="btn btn-primary btn-new width100">
-                              Deposit
-                            </button>
                           </div>
                         </div>
                       )}
