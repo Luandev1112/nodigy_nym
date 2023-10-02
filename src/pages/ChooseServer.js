@@ -17,7 +17,7 @@ const ChooseServer = () => {
     const [selectedServer, setSelectedServer] = useState(null);
     const [servers, setServers] = useState([]);
     const [project, setProject] = useState(null);
-    const [onbordingFee, setOnbordingFee] = useState(5);
+    const [onbordingFee, setOnbordingFee] = useState(0);
     const [monthlyPrice, setMonthlyPrice] = useState(0);
     const [dataCenters, setDataCenter] = useState(['Hetzner']);
     const [selectedDataCenter, setSelectedDataCenter] = useState(0);
@@ -78,59 +78,56 @@ const ChooseServer = () => {
 
     const gotoTopupPage = async() => {
         if(balance >= limitBalance){
-            // payment function here
-            if(selectedServer) {
-                try {
-                    setLoadingStatus(true);
-                    let formData = new FormData();
-                    formData.append('server_id', selectedServer.id);
-                    formData.append('price', limitBalance);
-                    const result = await Http.post(apiUrl + '/api/purchaseServer', formData);
+            try {
+                setLoadingStatus(true);
+                let formData = new FormData();
+                formData.append('server_id', selectedServer.id);
+                formData.append('price', limitBalance);
+                const result = await Http.post(apiUrl + '/api/purchaseServer', formData);
 
-                    const userBalance = result.data.user_balance;
-                    setBalance(userBalance);
-                    const hashId = result.data.transaction.txn_id;
-                    
-                    const _nodeId = result.data.node.id;
-                    const _projectId = result.data.node.project_id;
-                    const _locationId = locations[selectedLocationIndex].id;
-                    const _serverType = selectedServer.type;
-                    const _serverTypeId = selectedServer.server_type_id;
-                    
-                    const serverData = new FormData();
-                    serverData.append('project_id', _projectId);
-                    serverData.append('node_id', _nodeId);
-                    serverData.append('location_id', _locationId);
-                    serverData.append('server_type_id', _serverTypeId);
-                    serverData.append('data_center_type', _serverType);
-                    const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
-                    console.log("Create server result", createServerResult);
+                const userBalance = result.data.user_balance;
+                setBalance(userBalance);
+                const hashId = result.data.transaction.txn_id;
+                
+                const _nodeId = result.data.node.id;
+                const _projectId = result.data.node.project_id;
+                const _locationId = locations[selectedLocationIndex].id;
+                const _serverType = selectedServer.type;
+                const _serverTypeId = selectedServer.server_type_id;
+                
+                const serverData = new FormData();
+                serverData.append('project_id', _projectId);
+                serverData.append('node_id', _nodeId);
+                serverData.append('location_id', _locationId);
+                serverData.append('server_type_id', _serverTypeId);
+                serverData.append('data_center_type', _serverType);
+                const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
+                console.log("Create server result", createServerResult);
 
-                    const _createdServer = createServerResult.data.data.server;
-                    console.log("_created server: ", _createdServer);
-                    if(_createdServer){
-                        const _serverId = _createdServer.id;
-                        console.log("server id",_serverId);
-                        formData = new FormData();
-                        formData.append('server_id', _serverId);
-                        formData.append('node_id', _nodeId);
-                        const saveResult = await Http.post(apiUrl + '/api/save-server-id', formData);
-                        if(saveResult.data){
-                            navigate('/deposit-success', {
-                                state: {
-                                    hashId: hashId,
-                                    balanceType: 'server'
-                                }
-                            });
-                        }
+                const _createdServer = createServerResult.data.data.server;
+                console.log("_created server: ", _createdServer);
+                if(_createdServer){
+                    const _serverId = _createdServer.id;
+                    console.log("server id",_serverId);
+                    formData = new FormData();
+                    formData.append('server_id', _serverId);
+                    formData.append('node_id', _nodeId);
+                    const saveResult = await Http.post(apiUrl + '/api/save-server-id', formData);
+                    if(saveResult.data){
+                        navigate('/deposit-success', {
+                            state: {
+                                hashId: hashId,
+                                balanceType: 'server'
+                            }
+                        });
                     }
-
-                    setLoadingStatus(false);
-                    
-                } catch (error) {
-                    console.log(error);
-                    setLoadingStatus(false);
                 }
+
+                setLoadingStatus(false);
+                
+            } catch (error) {
+                console.log(error);
+                setLoadingStatus(false);
             }
             
         }else{
@@ -210,11 +207,40 @@ const ChooseServer = () => {
         
     }
 
+    const getNymSettings = async() => {
+        const projectId = 2;
+        let _setupFee = onbordingFee;
+        try {
+            const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+projectId);
+            _setupFee = result.data.data.wizard_setting.setup_fee*100/100;
+            setOnbordingFee(_setupFee);
+            // const _minStake = result.data.data.wizard_setting.min_stake*100/100;
+            
+        } catch (error) {
+            console.log("There is errro in getting the setting data");
+        }
+    }
+
     useEffect(() => {
+        getNymSettings();
         getInitNode();
         getEuroRate();
-        getServers();
+        getServers();    
     }, []);
+
+    useEffect(()=> {
+        console.log("balance ::: ", balance);
+        const _limitBalance = Number((onbordingFee*1 + gasFee).toFixed(2));
+        setLimitBalance(_limitBalance);
+        console.log("limit balance ::: ", _limitBalance);
+        if(balance < _limitBalance) {
+            setPaymentBtnText("Top-up account");
+            setBalanceStatus(true);
+        } else {
+            setPaymentBtnText("Complete Payment");
+            setBalanceStatus(false);
+        }
+    }, [balance]);
     return (
         <React.Fragment>
         {
