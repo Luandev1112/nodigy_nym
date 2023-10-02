@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import TransCongImage from '../assets/images/node-trans-congrats.png';
+import { apiUrl } from '../utils/script';
 
 import Header from '../common/Header';
 import Footer from '../common/Footer';
@@ -33,11 +34,11 @@ const StakeSuccess = () => {
                                             <div className="icon"><img src={TransCongImage} /></div>
                                             <h3>Congratulations!</h3>
                                             <p>Your node setup is completely done. <br />Tokens are staked.</p>
-                                            <p>You can check your node status, all the parameters, stake, withdraw and claim rewards on the node’s page in your <a href="">personal area</a></p>
+                                            <p>Please note: Newborn node needs some time to complete synchronization process. During that time node's status will be INACTIVE.<br />Update your node's name, description and logo, check your node's status and all information about your node in your <a href={apiUrl+"/admin/node/nym"}>personal area.</a></p>
                                         </div>
                                         <NymWallet nodeId={nodeId} />
                                         <div className="btn-container">
-                                            <a href="#" className="btn btn-primary width100">Go to Dashboard</a>
+                                            <a href={apiUrl+"/admin/dashboard"} className="btn btn-primary width100">Go to Dashboard</a>
                                         </div>
                                     </div>
                                 </div>

@@ -72,7 +72,7 @@ const TopupAccount = () => {
         break;
       case "wallet_price":
         if(validNumber(value)) {
-          setWalletPrice(value);
+          setWalletPrice(value*1);
           if(maxToken > 0 && value*1 < maxToken && value != '') {
             setDepositBtnActive(true);
           }else{

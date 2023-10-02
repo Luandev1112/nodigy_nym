@@ -156,7 +156,7 @@ const NodeInstall = () => {
                                                 <a href="#"><img src={EditImage} /></a>
                                             </div>
                                         </div>
-                                        <p className="graytext">The installation process may take up to an hour. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href="https://nodigy.com/admin/node/nym">personal area.</a></p>
+                                        <p className="graytext">The installation process may take up to an hour. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href={apiUrl+"/admin/node/nym"}>personal area.</a></p>
                                     </div>
                                 </div>
                             </div>

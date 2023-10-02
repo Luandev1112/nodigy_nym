@@ -121,7 +121,7 @@ const NodeSuccess = () => {
                                                     </tr>
                                                     <tr>
                                                         <td>Explorer:</td>
-                                                        <td className="text-end"><a href={"https://explorer.nymtech.net/network-components/mixnode/"+nodeId} className="fullurl">{shortenAddressString("https://explorer.nymtech.net/network-components/mixnode/"+nodeId, 46)} <img src={IconExportImage} /></a></td>
+                                                        <td className="text-end"><a href={"https://explorer.nymtech.net/network-components/mixnode/"+nodeId} className="fullurl" target='_blank'>{shortenAddressString("https://explorer.nymtech.net/network-components/mixnode/"+nodeId, 46)} <img src={IconExportImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Location:</td>
