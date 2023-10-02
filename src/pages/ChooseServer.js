@@ -214,23 +214,11 @@ const ChooseServer = () => {
             const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+projectId);
             _setupFee = result.data.data.wizard_setting.setup_fee*100/100;
             setOnbordingFee(_setupFee);
-            // const _minStake = result.data.data.wizard_setting.min_stake*100/100;
-            
+            // const _minStake = result.data.data.wizard_setting.min_stake*100/100;        
         } catch (error) {
             console.log("There is errro in getting the setting data");
         }
-    }
-
-    useEffect(() => {
-        getNymSettings();
-        getInitNode();
-        getEuroRate();
-        getServers();    
-    }, []);
-
-    useEffect(()=> {
-        console.log("balance ::: ", balance);
-        const _limitBalance = Number((onbordingFee*1 + gasFee).toFixed(2));
+        const _limitBalance = Number((_setupFee + gasFee).toFixed(2));
         setLimitBalance(_limitBalance);
         console.log("limit balance ::: ", _limitBalance);
         if(balance < _limitBalance) {
@@ -240,6 +228,16 @@ const ChooseServer = () => {
             setPaymentBtnText("Complete Payment");
             setBalanceStatus(false);
         }
+    }
+
+    useEffect(() => {
+        getInitNode();
+        getEuroRate();
+        getServers();    
+    }, []);
+
+    useEffect(()=> {
+        getNymSettings();        
     }, [balance]);
     return (
         <React.Fragment>
