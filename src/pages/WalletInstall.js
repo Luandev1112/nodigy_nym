@@ -5,9 +5,9 @@ import NodeImage from "../assets/images/nodes-logo-icon1.png";
 import EditImage from "../assets/images/icon-edit-2.svg";
 import InstallationImage from "../assets/images/node-installation-process.png";
 import ArrowRightImage from "../assets/images/arrow-right.svg";
-
 import Header from '../common/Header';
 import Footer from '../common/Footer';
+import ErrorModal from '../elements/ErrorModal';
 import { apiUrl, shortenAddress } from '../utils/script';
 
 const WalletInstall = () => {
@@ -20,8 +20,9 @@ const WalletInstall = () => {
     const [nextUrl, setNextUrl] = useState('/wallet-installation-success');
     const [prevUrl, setPrevUrl] = useState('/choose-server'); 
     const [errMsg, setErrorMsg] = useState('');
+    const [errorStatus, setErrorStatus] = useState(false);
+    const [errorContent, setErrorContent] = useState("");
     const navigate = useNavigate();
-
     const gotoGuidePage = () => {
         navigate('/wallet-install-guide');
     }
@@ -51,7 +52,7 @@ const WalletInstall = () => {
             const formData = new FormData();
             formData.append('wallet_address', walletAddress);
             formData.append('project_name', 'NYM');
-            const result = await Http.post(apiUrl+'/api/addWallet', formData);
+            const result = await Http.post(apiUrl+'/api/nym/add-wallet', formData);
             console.log("result : ", result);
             _walletStatus = true;
             setWalletStatus(true);
@@ -65,14 +66,24 @@ const WalletInstall = () => {
     }
 
     const getNymSettings = async() => {
-        const projectId = 2;
+        let _projectId = 0;
+        const _projectResult = await Http.get(apiUrl + '/api/project/detail/NYM');
+        if(_projectResult.data.status == 1)
+        {
+            _projectId = _projectResult.data.project.id;
+        } else {
+            setErrorStatus(true);
+            setErrorContent("There is not NYM project");
+            return;
+        }
         try {
-            const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+projectId);
+            const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+_projectId);
             const _minStake = result.data.data.wizard_setting.min_stake*100/100;
             setMinStake(_minStake);
             handleErrorMemssage(false, _minStake);
         } catch (error) {
-            console.log("There is errro in getting the setting data");
+            setErrorStatus(true);
+            setErrorContent("There is errro in getting the setting data");
         }
     }
 
@@ -111,6 +122,7 @@ const WalletInstall = () => {
                     </div>
                 </div>
             </div>
+            <ErrorModal errorContent={errorContent} status={errorStatus} />
             <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} handleStep={handleStep} />
         </div>
     )

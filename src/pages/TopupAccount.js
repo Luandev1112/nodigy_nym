@@ -144,7 +144,7 @@ const TopupAccount = () => {
               "date",
               broadcastTransaction.transaction.raw_data.timestamp
             );
-            const result = await Http.post(apiUrl+"/api/walletPayment", formData);
+            const result = await Http.post(apiUrl+"/api/nym/wallet-payment", formData);
             if (result.data.user) {
               const _myBalance = result.data.user.balance;
               setBalance(_myBalance);
@@ -178,6 +178,7 @@ const TopupAccount = () => {
     setMaxToken(0);
     setWalletPrice(0);
     setDepositBtnActive(false);
+    setWalletPrice(0);
   };
 
   const connectTron = async () => {
@@ -210,6 +211,11 @@ const TopupAccount = () => {
           const walletBalance = Number(balance) / 1000000;
           setMaxToken(walletBalance);
           setConnectBtnActive(false);
+          if(walletBalance > 0 && walletPrice*1 < walletBalance && walletPrice != '') {
+            setDepositBtnActive(true);
+          }else{
+            setDepositBtnActive(false);
+          }
         }
       } catch (error) {
         setConnectBtnActive(true);

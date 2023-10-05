@@ -1,16 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import TransCongImage from '../assets/images/node-trans-congrats.png';
 import { apiUrl } from '../utils/script';
 
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
 import NymWallet from '../elements/NymWallet';
 
 const StakeSuccess = () => {
-    const { state } = useLocation();
-    const [nodeId, setNodeId] = useState(state?state.nodeId:null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [nodeId, setNodeId] = useState(searchParams.get('nodeId'));
     const [balance, setBalance] = useState(0);
     const [step, setStep] = useState(8);
     const [subStep, setSubStep] = useState(0);
@@ -21,8 +20,7 @@ const StakeSuccess = () => {
     });
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} />
-            <ProgressBar step={8} />
+            <Header setBalance={setBalance} myBalance={balance} step={8} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">

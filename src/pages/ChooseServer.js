@@ -26,7 +26,7 @@ const ChooseServer = () => {
     const [step, setStep] = useState(3);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
-    const [prevUrl, setPrevUrl] = useState('https://nodigy.com/admin/wallet-connect'); 
+    const [prevUrl, setPrevUrl] = useState(apiUrl+'/admin/wallet-connect'); 
     const [exchangeRate, setExchangeRate] = useState(1);
     const [serverLocations, setServerLocations] = useState([]);
     const [locations, setLocations] = useState([]);
@@ -77,81 +77,65 @@ const ChooseServer = () => {
     } 
 
     const gotoTopupPage = async() => {
-        if(balance >= limitBalance){
-            try {
-                setLoadingStatus(true);
-                let formData = new FormData();
-                formData.append('server_id', selectedServer.id);
-                formData.append('price', limitBalance);
-                const result = await Http.post(apiUrl + '/api/purchaseServer', formData);
-
-                const userBalance = result.data.user_balance;
-                setBalance(userBalance);
-                const hashId = result.data.transaction.txn_id;
-                
-                const _nodeId = result.data.node.id;
-                const _projectId = result.data.node.project_id;
-                const _locationId = locations[selectedLocationIndex].id;
-                const _serverType = selectedServer.type;
-                const _serverTypeId = selectedServer.server_type_id;
-                
-                const serverData = new FormData();
-                serverData.append('project_id', _projectId);
-                serverData.append('node_id', _nodeId);
-                serverData.append('location_id', _locationId);
-                serverData.append('server_type_id', _serverTypeId);
-                serverData.append('data_center_type', _serverType);
-                const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
-                console.log("Create server result", createServerResult);
-
-                const _createdServer = createServerResult.data.data.server;
-                console.log("_created server: ", _createdServer);
-                if(_createdServer){
-                    const _serverId = _createdServer.id;
-                    console.log("server id",_serverId);
-                    formData = new FormData();
-                    formData.append('server_id', _serverId);
-                    formData.append('node_id', _nodeId);
-                    const saveResult = await Http.post(apiUrl + '/api/save-server-id', formData);
-                    if(saveResult.data){
-                        navigate('/deposit-success', {
-                            state: {
-                                hashId: hashId,
-                                balanceType: 'server'
-                            }
-                        });
+        if(balanceStatus) {
+            if(balance >= limitBalance){
+                try {
+                    setLoadingStatus(true);
+                    let formData = new FormData();
+                    formData.append('server_id', selectedServer.id);
+                    formData.append('price', limitBalance);
+                    const result = await Http.post(apiUrl + '/api/nym/purchase-server', formData);
+    
+                    const userBalance = result.data.user_balance;
+                    setBalance(userBalance);
+                    const hashId = result.data.transaction.txn_id;
+                    
+                    const _nodeId = result.data.node.id;
+                    const _projectId = result.data.node.project_id;
+                    const _locationId = locations[selectedLocationIndex].id;
+                    const _serverType = selectedServer.type;
+                    const _serverTypeId = selectedServer.server_type_id;
+                    
+                    const serverData = new FormData();
+                    serverData.append('project_id', _projectId);
+                    serverData.append('node_id', _nodeId);
+                    serverData.append('location_id', _locationId);
+                    serverData.append('server_type_id', _serverTypeId);
+                    serverData.append('data_center_type', _serverType);
+                    const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
+                    console.log("Create server result", createServerResult);
+    
+                    const _createdServer = createServerResult.data.data.server;
+                    console.log("_created server: ", _createdServer);
+                    if(_createdServer){
+                        const _serverId = _createdServer.id;
+                        console.log("server id",_serverId);
+                        formData = new FormData();
+                        formData.append('server_id', _serverId);
+                        formData.append('node_id', _nodeId);
+                        const saveResult = await Http.post(apiUrl + '/api/nym/save-server-id', formData);
+                        if(saveResult.data){
+                            navigate('/deposit-success', {
+                                state: {
+                                    hashId: hashId,
+                                    balanceType: 'server'
+                                }
+                            });
+                        }
                     }
+    
+                    setLoadingStatus(false);
+                    
+                } catch (error) {
+                    console.log(error);
+                    setLoadingStatus(false);
                 }
-
-                setLoadingStatus(false);
                 
-            } catch (error) {
-                console.log(error);
-                setLoadingStatus(false);
+            }else{
+                navigate('/top-up-account');
             }
-            
-        }else{
-            navigate('/top-up-account');
         }
     }
-
-    const getInitNode = async() => {
-        try {
-            let _initNode = await Http.get(apiUrl+'/api/getInitialNode');
-            if(_initNode.data.node && _initNode.data.node.description){
-                navigate('/wallet-installation-success');
-                return;
-            }
-            if(_initNode.data.node && _initNode.data.node.server_id){
-                navigate('/wallet-identification');
-                return;
-            }   
-        } catch (error) {
-            setErrorStatus(true);
-            setErrorContent("There is error in get inital node");
-        }
-    }
-
 
     const getEuroRate = async() => {
         try {
@@ -164,9 +148,18 @@ const ChooseServer = () => {
     }
 
     const getServers = async() => {
-        const project_id = 2;
         try {
-            const _result = await Http.get(apiUrl + '/api/datacenter/country?project_id='+project_id);
+            let _projectId = 0;
+            const _projectResult = await Http.get(apiUrl + '/api/project/detail/NYM');
+            if(_projectResult.data.status == 1)
+            {
+                _projectId = _projectResult.data.project.id;
+            } else {
+                setErrorStatus(true);
+                setErrorContent("There is not NYM project");
+                return;
+            }
+            const _result = await Http.get(apiUrl + '/api/datacenter/country?project_id='+_projectId);
             const _serverLocations = _result.data.data;
             setServerLocations(_serverLocations);   
             let _locations = [];
@@ -201,6 +194,11 @@ const ChooseServer = () => {
 
     const selectLocation = (idx) => {
         setSelectedLocationIndex(idx);
+        setSelectedId(0);
+        setMonthlyPrice(0);
+        const _limitBalance = Number((onbordingFee*1 + gasFee).toFixed(2));
+        setLimitBalance(_limitBalance);
+        setBalanceStatus(false);
         const _serverLocation = serverLocations[idx];
         const _servers = _serverLocation.server;
         setServers(_servers);
@@ -208,10 +206,19 @@ const ChooseServer = () => {
     }
 
     const getNymSettings = async() => {
-        const projectId = 2;
+        let _projectId = 0;
+        const _projectResult = await Http.get(apiUrl + '/api/project/detail/NYM');
+        if(_projectResult.data.status == 1)
+        {
+            _projectId = _projectResult.data.project.id;
+        } else {
+            setErrorStatus(true);
+            setErrorContent("There is not NYM project");
+            return;
+        }
         let _setupFee = onbordingFee;
         try {
-            const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+projectId);
+            const result = await Http.get(apiUrl+'/api/project/wizard-setting-view/'+_projectId);
             _setupFee = result.data.data.wizard_setting.setup_fee*100/100;
             setOnbordingFee(_setupFee);
             // const _minStake = result.data.data.wizard_setting.min_stake*100/100;        
@@ -231,7 +238,6 @@ const ChooseServer = () => {
     }
 
     useEffect(() => {
-        getInitNode();
         getEuroRate();
         getServers();    
     }, []);

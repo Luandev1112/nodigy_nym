@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
 import NymWallet from '../elements/NymWallet';
+import { apiUrl } from '../utils/script';
+import Http from "../utils/Http";
 const Stake = () => {
-    const { state } = useLocation();
-    const [nodeId, setNodeId] = useState(state?state.nodeId:null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [nodeId, setNodeId] = useState(searchParams.get('nodeId'));
     const [balance, setBalance] = useState(0);
     const [step, setStep] = useState(8);
     const [subStep, setSubStep] = useState(0);
@@ -16,18 +18,18 @@ const Stake = () => {
     const navigate = useNavigate();
 
     const handleStep = async() => {
-        navigate(nextUrl, {
-            state: {
-                nodeId: nodeId
-            }
-        })   
+        const formData = new FormData();
+        formData.append('node_id', nodeId);
+        formData.append('status', 'dashboard');
+        const nodeInstallationResult = Http.post(apiUrl+'/api/nym/set-installation-status', formData);
+        navigate(nextUrl+'?nodeId='+nodeId);   
     }
 
     useEffect(() => {
     }, []);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} step={3} />
+            <Header setBalance={setBalance} myBalance={balance} step={8} />
             <div className="steps-content nodeinstallation">
                 <div className="container">
                     <div className="row">

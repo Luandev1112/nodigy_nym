@@ -5,7 +5,7 @@ import NodeImage from "../assets/images/nodes-logo-icon1.png";
 import EditImage from "../assets/images/icon-edit-2.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import ProgressBar from '../common/ProgressBar';
+import NymWallet from '../elements/NymWallet';
 import {CircularProgressbar} from 'react-circular-progressbar';
 import "react-circular-progressbar/dist/styles.css";
 import { apiUrl, shortenAddress } from '../utils/script';
@@ -23,7 +23,7 @@ const NodeInstall = () => {
     const getWalletAddress = async() => {
         const formData = new FormData();
         formData.append('project_name', 'NYM');
-        const res = await Http.post(apiUrl + "/api/getNodeWallet", formData);
+        const res = await Http.post(apiUrl + "/api/nym/get-node-wallet", formData);
         const _walletAddress = res.data.wallet;
         setWalletAddress(_walletAddress);
     }
@@ -44,24 +44,18 @@ const NodeInstall = () => {
                     setInstallDescription(stepDescription);
                     _percentage = parseInt(prevStep*10000/fullStep) / 100 ; 
                     setPercetage(_percentage);
-    
-                    // if(_percentage == 100) {
-                    //     setInstallTitle("Installation successful");
-                    //     setTimeout(() => {
-                    //         navigate('/bond-wallet');
-                    //     }, 3000);
-                    // }
 
                     if (prevStep == 7)
                     {
+                        const formData = new FormData();
+                        formData.append('node_id', node.id);
+                        formData.append('status', 'signature');
+                        const nodeInstallationResult = Http.post(apiUrl+'/api/nym/set-installation-status', formData);
                         setInstallTitle("Installation successful");
                         setTimeout(() => {
                             navigate('/bond-wallet');
                         }, 3000);
-
                     }
-
-                    
                 } else {
                     console.log("There are some errors in installation");
                 }  
@@ -75,7 +69,7 @@ const NodeInstall = () => {
     }
 
     const getInitNode = async() => {
-        let _initNode = await Http.get(apiUrl+'/api/getInitialNode');
+        let _initNode = await Http.get(apiUrl+'/api/nym/get-initial-node');
         setNode(_initNode.data.node);
         const _serverId = _initNode.data.node.server_id;
         setServerId(_serverId);
@@ -143,19 +137,7 @@ const NodeInstall = () => {
                                             <div className="text">{installTitle}</div>
                                             <p className="graytext">{installDescription}</p>
                                         </div>
-                                        <div className="item border-left">
-                                            <div className="img"><img src={NodeImage} /></div>
-                                            <div className="text">
-                                                <div className="item-name"><a href="#">NYM node</a></div>
-                                                <div className="item-text">
-                                                    <div className="whitetext">Wallet address: {shortenAddress(walletAddress)}</div>
-                                                    <div className="bluetext">NYM (NYM Mainnet)</div>	
-                                                </div>
-                                            </div>
-                                            <div className="action">
-                                                <a href="#"><img src={EditImage} /></a>
-                                            </div>
-                                        </div>
+                                        {node && <NymWallet nodeId={node.id} /> }
                                         <p className="graytext">The installation process may take up to an hour. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href={apiUrl+"/admin/node/nym"}>personal area.</a></p>
                                     </div>
                                 </div>

@@ -30,7 +30,7 @@ const NymWallet = ({nodeId}) => {
             const formData = new FormData();
             formData.append('node_id', nodeId);
             formData.append('node_name', nodeName);
-            const result = await Http.post(apiUrl+'/api/update-node-name', formData);
+            const result = await Http.post(apiUrl+'/api/nym/update-node-name', formData);
             if(result.data.status == 1) {
                 setNameEditStatus(false);
             }
@@ -43,12 +43,12 @@ const NymWallet = ({nodeId}) => {
     const getNode = async() => {
         const nodeForm = new FormData();
         nodeForm.append('node_id', nodeId);
-        const nodeResult = await Http.post(apiUrl+'/api/node-info', nodeForm);
+        const nodeResult = await Http.post(apiUrl+'/api/nym/node-info', nodeForm);
         console.log("Node data status: ", nodeResult.data);
         if(nodeResult.data.status == 1){
             const _node = nodeResult.data.node;
             const _nodeName = _node.node_name;
-            const _walletAddress = _node.description;
+            const _walletAddress = _node.node_wallet;
             setWalletAddress(_walletAddress);
             setNodeName(_nodeName);
             setNodeNameTemp(_nodeName);
