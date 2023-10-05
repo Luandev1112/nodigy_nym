@@ -28,7 +28,7 @@ const DepositSuccess = () => {
         }
     }
     const getTransaction = async() => {
-        const res = await Http.get(apiUrl+'/api/getTransaction/'+hashId);
+        const res = await Http.get(apiUrl+'/api/nym/get-transaction/'+hashId);
         setAmount(res.data.amount);
     }
 

@@ -93,15 +93,11 @@ const ChooseServer = () => {
             const formData = new FormData();
             formData.append('node_id', node.id);
             formData.append('node_status', 1);
-            const result = await Http.post(apiUrl+'/api/set-node-status', formData);
+            formData.append('installation_status', 'success');
+            const result = await Http.post(apiUrl+'/api/nym/set-node-status', formData);
             console.log("result.data.status: ", result.status);
             if(result.status == 200) {
-                navigate('/node-installation-success', {
-                    state: {
-                        nodeId: node.id,
-                        projectId: node.project_id
-                    }
-                });
+                navigate('/node-installation-success?nodeId='+node.id);
             }
         }
     }
@@ -114,7 +110,7 @@ const ChooseServer = () => {
     }
 
     const getInitNode = async() => {
-        let _initNodeResult = await Http.get(apiUrl+'/api/getInitialNode');
+        let _initNodeResult = await Http.get(apiUrl+'/api/nym/get-initial-node');
         if(_initNodeResult.data.status == 1) {
             const _node = _initNodeResult.data.node;
             if(_node != null){
@@ -205,8 +201,7 @@ const ChooseServer = () => {
                                     
                                     <div className="video-container">
                                         <video className="w-100" id="autoplay" muted playsInline controls loop>
-                                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-                                            <source src="https://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg" />
+                                            <source src={apiUrl+"/videos/NYM_bonding.mp4"} type="video/mp4" />
                                             Your browser does not support HTML video.
                                         </video>
                                     </div>
@@ -309,11 +304,17 @@ const ChooseServer = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td className="td-name">Signature:</td>
+                                                        {finishClass == '' ? 
                                                         <td className="text-end"><span>{shortenAddressString(signatureWallet, 26)}</span>
                                                         {
                                                             shortenAddressString(signatureWallet, 26) != '' && <a onClick={()=>copyLink(signatureWallet, 'signature')} > <img src={copyContent=='signature'?CheckCircleImage:CopyImage} /></a>
                                                         }
+                                                        </td> :
+                                                        <td className="text-end">
+                                                            <div className="button-spinner" />
                                                         </td>
+                                                        }
+                                                        
                                                     </tr>
                                                 </tbody>
                                             </table>

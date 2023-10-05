@@ -2,11 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
+import { apiUrl } from '../utils/script';
 const InstallGuide = () => {
     const [balance, setBalance] = useState(0);
     const [step, setStep] = useState(6);
     const [nextUrl, setNextUrl] = useState('');
-    const [prevUrl, setPrevUrl] = useState('/wallet-idetification'); 
+    const [prevUrl, setPrevUrl] = useState('/wallet-identification'); 
     const navigate = useNavigate();
     const gotoPrevPage = () => {
         navigate('/wallet-identification');
@@ -23,8 +24,7 @@ const InstallGuide = () => {
                     <div className="title">Wallet installation guide</div>
                     <div className="video-container">
                         <video id="autoplay" muted playsInline controls loop>
-                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-                            <source src="https://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg" />
+                            <source src={apiUrl+"/videos/NYM_wallet_install.mp4"} type="video/mp4" />
                             Your browser does not support HTML video.
                         </video>
                     </div>

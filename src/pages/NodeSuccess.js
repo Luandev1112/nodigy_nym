@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import InstallImage from '../assets/images/icon-installation.png';
 import CopyImage from '../assets/images/icon-copy.svg';
 import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
@@ -10,11 +10,12 @@ import { apiUrl, shortenAddress, shortenAddressString } from '../utils/script';
 import Http from "../utils/Http";
 import flagList from "../data/wallet/flagList.json";
 import NymWallet from '../elements/NymWallet';
+import ErrorModal from '../elements/ErrorModal';
 const NodeSuccess = () => {
-    const { state } = useLocation();
     const [balance, setBalance] = useState(0);
-    const [nodeId, setNodeId] = useState(state?state.nodeId:null);
-    const [projectId, setProjectId] = useState(state?state.projectId:null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [nodeId, setNodeId] = useState(searchParams.get('nodeId'));
+    const [projectId, setProjectId] = useState();
     const [step, setStep] = useState(7);
     const [subStep, setSubStep] = useState(0);
     const [nextUrl, setNextUrl] = useState('');
@@ -28,14 +29,16 @@ const NodeSuccess = () => {
     const [mixPort, setMixPort] = useState('');
     const [country, setCountry] = useState('');
     const [nodeKey, setNodeKey] = useState('');
+    const [errorStatus, setErrorStatus] = useState(false);
+    const [errorContent, setErrorContent] = useState("");
 
     const navigate = useNavigate();
-    const gotoNextPage = () => {
-        navigate('/stake', {
-            state: {
-                nodeId: nodeId
-            }
-        });
+    const gotoNextPage = async() => {
+        const formData = new FormData();
+        formData.append('node_id', nodeId);
+        formData.append('status', 'stake');
+        const nodeInstallationResult = Http.post(apiUrl+'/api/nym/set-installation-status', formData);
+        navigate('/stake?nodeId='+nodeId);
     }
 
     const copyLink = async(address, term) => {
@@ -45,15 +48,23 @@ const NodeSuccess = () => {
         }
     }
     
-    const getNodeDetail = async() => {   
-        if(nodeId == null){
-            return;
-        }    
+    const getNodeDetail = async() => {    
 
+        let _projectId = 0;
+        const _projectResult = await Http.get(apiUrl + '/api/project/detail/NYM');
+        if(_projectResult.data.status == 1)
+        {
+            _projectId = _projectResult.data.project.id;
+        } else {
+            setErrorStatus(true);
+            setErrorContent("There is not NYM project");
+            return;
+        }
         const formData = new FormData();
         formData.append('node_id', nodeId);
-        formData.append('project_id', projectId);
+        formData.append('project_id', _projectId);
         const result = await Http.post(apiUrl+'/api/wizard-setting-nym/view', formData); 
+        console.log("Result::: ", result);
         if(result.data.success){
             const nodeData = result.data.data;
             setWalletAddress(nodeData.wallet);
@@ -74,13 +85,16 @@ const NodeSuccess = () => {
     }
 
     useEffect(() => {
-        if(nodeId && projectId) {
+        if(nodeId && nodeId > 0) {
             getNodeDetail();
+        }else{
+            setErrorStatus(true);
+            setErrorContent("There is error");
         }
     }, []);
     return (
         <div className="steps">
-            <Header setBalance={setBalance} myBalance={balance} step={6} />
+            <Header setBalance={setBalance} myBalance={balance} step={7} />
             <div className="steps-content nodeinstallation installation">
                 <div className="container">
                     <div className="row">
@@ -142,6 +156,7 @@ const NodeSuccess = () => {
                     </div>
                 </div>
             </div>
+            <ErrorModal errorContent={errorContent} status={errorStatus} />
             <Footer step={step} prevUrl={prevUrl} nextUrl={nextUrl} />
         </div>
     )

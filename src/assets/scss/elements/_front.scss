@@ -1979,8 +1979,9 @@ footer .items ul li a:hover {
         position: fixed;
         width: 100%;
         z-index: 99;
-		background-color: #acacac16;
+		background-color: #08080820;
 		box-shadow: 0px 10px 16px #acacac14;
+		backdrop-filter: blur(10px);
         .step-header {
             padding: 25px 0;
             .container {
@@ -2259,7 +2260,9 @@ footer .items ul li a:hover {
         bottom: 0;
         width: 100%;
         z-index: 99;
-		background-color: #acacac16;
+		background-color: #08080820;
+		box-shadow: 0px -6px 10px 0px #acacac12;
+		backdrop-filter: blur(6px);
         ul {
             margin: 0;
             padding: 0;
@@ -2857,6 +2860,7 @@ footer .items ul li a:hover {
 
 .steps-content.fullwidthcontainer .container {
 	max-width: 1210px;
+	position: unset;
 }
 
 .step5 .items {
@@ -2928,59 +2932,52 @@ footer .items ul li a:hover {
 
 .transferdetailsbox {
 	margin-bottom: 30px;
-}
-
-.transferdetailsbox label {
-	font-family: var( --font-primary);
-	font-style: normal;
-	font-weight: 700;
-	font-size: 16px;
-	line-height: 150%;
-	color: #A0AEC0;
-}
-
-.transferdetailsbox p {
-	font-family: var( --secondary-font);
-	font-style: normal;
-	font-weight: 700;
-	font-size: 20px;
-	color: var(--color-white);
-	text-align: right;
-}
-
-.transferdetailsbox .title {
-	margin-bottom: 30px;
-}
-
-.transferdetailsbox .btn-container {
-	text-align: center;
-	margin-top: 40px;
-}
-
-.transferdetailsbox .btn-container .btn {
-	font-family: var( --font-primary);
-	font-style: normal;
-	font-weight: 700;
-	font-size: 26px;
-	line-height: 24px;
-	width: 100%;
-	color: var(--color-white);
-	background: var(--color-primary);
-	border-color: var(--color-primary);
-	border-radius: 12px;
-}
-
-.transferdetailsbox .totalrow {
-	border-top: 1px solid #2A313C;
-	padding-top: 30px;
-}
-
-.transferdetailsbox .totalrow label {
-	color: var(--color-white);
-	font-family: var( --secondary-font);
-	font-style: normal;
-	font-weight: 700;
-	font-size: 24px;
+	label {
+		font-family: var( --font-primary);
+		font-style: normal;
+		font-weight: 700;
+		font-size: 16px;
+		line-height: 150%;
+		color: #A0AEC0;
+	}
+	p {
+		font-family: var( --secondary-font);
+		font-style: normal;
+		font-weight: 700;
+		font-size: 20px;
+		color: var(--color-white);
+		text-align: right;
+	}
+	.title {
+		margin-bottom: 30px;
+	}
+	.btn-container {
+		text-align: center;
+		margin-top: 40px;
+		.btn {
+			font-family: var( --font-primary);
+			font-style: normal;
+			font-weight: 700;
+			font-size: 22px;
+			line-height: 24px;
+			width: 100%;
+			color: var(--color-white);
+			background: var(--color-primary);
+			border-color: var(--color-primary);
+			border-radius: 12px;
+		}
+	}
+	.totalrow {
+		border-top: 1px solid #2A313C;
+		padding-top: 30px;
+		label {
+			color: var(--color-white);
+			font-family: var( --secondary-font);
+			font-style: normal;
+			font-weight: 700;
+			font-size: 24px;
+		}
+	}
 }
 
 .step5 .whitetext {
@@ -6622,10 +6619,11 @@ a {
 	color: var(--color-white);
 	padding: 16px;
 	resize: none;
+	
 	/* Style the scrollbar */
 	&::-webkit-scrollbar {
-		width: 10px; /* Set the width of the scrollbar */
-		background-color: transparent; /* Set the background color of the track */
+		width: 8px; /* Set the width of the scrollbar */
+		background-color: #5E596F33; /* Set the background color of the track */
 	}
 	
 	/* Style the scrollbar track */
@@ -6635,9 +6633,9 @@ a {
 	
 	/* Style the scrollbar thumb */
 	&::-webkit-scrollbar-thumb {
-		background-color: #666; /* Set the background color of the thumb */
+		background-color: #5E596F; /* Set the background color of the thumb */
 		border: solid 3px transparent;
-		border-radius: 10px;
+		border-radius: 8px;
 	}
 	
 	/* Style the scrollbar thumb on hover */

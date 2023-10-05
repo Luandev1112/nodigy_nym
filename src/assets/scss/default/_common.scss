@@ -661,6 +661,28 @@ button.close {
 
 body {
 	background: #1a202c;
+    /* Style the scrollbar */
+	&::-webkit-scrollbar {
+		width: 8px; /* Set the width of the scrollbar */
+		background-color: #5E596F33; /* Set the background color of the track */
+	}
+	
+	/* Style the scrollbar track */
+	&::-webkit-scrollbar-track {
+		background-color: transparent; /* Set the background color of the track */
+	}
+	
+	/* Style the scrollbar thumb */
+	&::-webkit-scrollbar-thumb {
+		background-color: #5E596F; /* Set the background color of the thumb */
+		border: solid 3px transparent;
+		border-radius: 8px;
+	}
+	
+	/* Style the scrollbar thumb on hover */
+	&::-webkit-scrollbar-thumb:hover {
+		background-color: #555; /* Set the background color of the thumb on hover */
+	}
 }
 
 
