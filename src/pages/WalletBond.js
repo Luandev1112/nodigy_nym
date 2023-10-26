@@ -97,6 +97,22 @@ const ChooseServer = () => {
             const result = await Http.post(apiUrl+'/api/nym/set-node-status', formData);
             console.log("result.data.status: ", result.status);
             if(result.status == 200) {
+                const _node = result.data.node;
+                const _project = result.data.project;
+                if(_node && _project) {
+                    let supportedWalletId = 0;
+                    if(_project.supp_wallet_id) {
+                        supportedWalletId = parseInt(_project.supp_wallet_id.split(',')[0]);
+                    }
+                    const formData = new FormData();
+                    formData.append('wallet_id', supportedWalletId);
+                    formData.append('node_id', _node.id);
+                    formData.append('network_id', _project.network_id);
+                    formData.append('wallet_name', _node.node_name);
+                    formData.append('wallet_address', _node.node_wallet);
+                    const result = await Http.post(apiUrl + '/api/wallet/save-user-wallet', formData);
+                }
+
                 navigate('/node-installation-success?nodeId='+node.id);
             }
         }
