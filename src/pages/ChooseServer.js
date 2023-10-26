@@ -19,8 +19,8 @@ const ChooseServer = () => {
     const [project, setProject] = useState(null);
     const [onbordingFee, setOnbordingFee] = useState(0);
     const [monthlyPrice, setMonthlyPrice] = useState(0);
-    const [dataCenters, setDataCenter] = useState(['Hetzner']);
-    const [selectedDataCenter, setSelectedDataCenter] = useState(0);
+    // const [dataCenters, setDataCenter] = useState(['Hetzner']);
+    // const [selectedDataCenter, setSelectedDataCenter] = useState(0);
     const [selectedLocationIndex, setSelectedLocationIndex] = useState(-1);
     const [balance, setBalance] = useState(0);
     const [step, setStep] = useState(3);
@@ -41,6 +41,7 @@ const ChooseServer = () => {
 
     const selectServer = (idx) => {
         const _selectedServer = servers[idx];
+        console.log("Selected Server: => ", _selectedServer);
         setSelectedServer(_selectedServer);
         setSelectedId(_selectedServer.id);
         const _price = Number((_selectedServer.price_monthly_gross * exchangeRate).toFixed(2));
@@ -188,9 +189,9 @@ const ChooseServer = () => {
     }
 
 
-    const selectDatacenter = (idx) => {
-        setSelectedDataCenter(idx);
-    }
+    // const selectDatacenter = (idx) => {
+    //     setSelectedDataCenter(idx);
+    // }
 
     const selectLocation = (idx) => {
         setSelectedLocationIndex(idx);
@@ -291,7 +292,7 @@ const ChooseServer = () => {
                                             </table>
                                         </div>
 
-                                        <div className="form-group mt-4">
+                                        {/* <div className="form-group mt-4">
                                             <label>Choose Hosting Provider</label>
                                             <Dropdown className="dropdown-currency">
                                                 <Dropdown.Toggle variant="default" id="">
@@ -320,7 +321,7 @@ const ChooseServer = () => {
                                                 }
                                                 </Dropdown.Menu>
                                             </Dropdown>
-                                        </div>
+                                        </div> */}
                                         
                                         <div className="form-group mt-4">
                                             <label>Choose a country</label>

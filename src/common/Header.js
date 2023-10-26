@@ -6,10 +6,17 @@ import LogoImage from "../assets/images/logo.svg";
 import ProfileImage from "../assets/images/profile-img.png";
 import IconSettingsImage from "../assets/images/icon-setings.png";
 import IconEmptyWallet from "../assets/images/icon-empty-wallet.png";
-import IconLogoutImage from "../assets/images/icon-setings.png";
+import IconLogoutImage from "../assets/images/icon-logout.png";
 import IconNotifications from "../assets/images/icon-notifications.png";
 import ProgressBar from './ProgressBar';
 import { apiUrl } from '../utils/script';
+
+import NodeLogo1 from "../assets/images/nodes-logo-icon1.png";
+import NodeLogo2 from "../assets/images/nodes-logo-icon2.png";
+import NodeLogo3 from "../assets/images/nodes-logo-icon3.png";
+
+import IconDoubleCheckImage from "../assets/images/icon-doublecheck-blue.svg";
+import IconPrevImage from "../assets/images/node-prep-icon1.svg";
 
 const Header = ({setBalance, myBalance, step}) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -99,6 +106,22 @@ const Header = ({setBalance, myBalance, step}) => {
     }
   }
 
+  const shortenEmail = (email) => {
+    if(email && email.length > 0) {
+      const strArray = email.split("@");
+      let firstString = strArray[0];
+      let secondString = strArray[1];
+      if(firstString.length <= 2){
+          newString = "**";
+      }else{
+        firstString = firstString.substr(0 , 1) + "**" + firstString.substr(-1, 1) + "@";
+      }
+      return firstString + secondString;
+    }else {
+      return email;
+    }  
+  }
+
   useEffect(()=>{
     getApiUser();
     getInitNode();
@@ -129,9 +152,72 @@ const Header = ({setBalance, myBalance, step}) => {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                    <li><Dropdown.Item>Option 1</Dropdown.Item></li>
-                    <li><Dropdown.Item>Option 2</Dropdown.Item></li>
-                </Dropdown.Menu>
+                <div className='notifications-header'>
+                  <h3>Notifications</h3>
+                  <a role='button'><img src={IconDoubleCheckImage} />Mark all as read</a>
+                </div>
+                <div className='notifications-body'>
+                  <li>
+                    <Dropdown.Item>
+                      <div className='noti-img'>
+                        <img src={NodeLogo1} />
+                      </div>
+                      <div className='noti-content'>
+                        <h4 className='noti-title'>
+                          Arbitrum
+                        </h4>
+                        <p className='noti-description'>You have set $200.00 to NODE NAME 1234</p>
+                        <span className='noti-time'>2 min ago</span>
+                      </div>
+                    </Dropdown.Item>
+                  </li>
+                  <li>
+                    <Dropdown.Item>
+                      <div className='noti-img'>
+                        <img src={NodeLogo2} />
+                      </div>
+                      <div className='noti-content'>
+                        <h4 className='noti-title'>
+                          Node installation is in progress
+                        </h4>
+                        <p className='noti-description'>Tellus id interdum velit laoreet id donec. Leo integer malesuada nunc vel risus commodo </p>
+                        <span className='noti-time'>5 min ago</span>
+                      </div>
+                    </Dropdown.Item>
+                  </li>
+                  <li>
+                    <Dropdown.Item>
+                      <div className='noti-img'>
+                        <img src={NodeLogo3} />
+                      </div>
+                      <div className='noti-content'>
+                        <h4 className='noti-title'>
+                          Forta
+                        </h4>
+                        <p className='noti-description'>You have a new payment request from Forta Projects for $800.00 </p>
+                        <span className='noti-time'>1 hour ago</span>
+                      </div>
+                    </Dropdown.Item>
+                  </li>
+                  <li>
+                    <Dropdown.Item>
+                      <div className='noti-img'>
+                        <img src={IconPrevImage} />
+                      </div>
+                      <div className='noti-content'>
+                        <h4 className='noti-title'>
+                          Payment Received
+                        </h4>
+                        <p className='noti-description'>Receive new payment $100 from Creative Uzbeks </p>
+                        <span className='noti-time'>18 hour ago</span>
+                      </div>
+                    </Dropdown.Item>
+                  </li>
+                </div>
+                <div className='notifications-footer'>
+                  <a role='button' href={apiUrl+'/admin/notifications'}>See all notifications</a>
+                </div>
+              </Dropdown.Menu>
             </Dropdown>
             
             <Dropdown className="profiledropdown">
@@ -141,9 +227,9 @@ const Header = ({setBalance, myBalance, step}) => {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                    <li className="title"><Dropdown.Item>{user.email}</Dropdown.Item></li>
-                    <li><Dropdown.Item><img src={IconSettingsImage} /> Account settings</Dropdown.Item></li>
-                    <li><Dropdown.Item><img src={IconLogoutImage} /> Logout</Dropdown.Item></li>
+                    <li className="title"><Dropdown.Item>{shortenEmail(user.email)}</Dropdown.Item></li>
+                    <li><Dropdown.Item href={apiUrl+'/admin/settings/emails'} ><img src={IconSettingsImage} /> Account settings</Dropdown.Item></li>
+                    <li><Dropdown.Item href={apiUrl+'/logout'} ><img src={IconLogoutImage} /> Logout</Dropdown.Item></li>
                     <li className="last">
                         <span className="text">Dark mode</span>
                         <div className="cus_switch themechange">
