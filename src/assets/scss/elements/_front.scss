@@ -2039,6 +2039,7 @@ footer .items ul li a:hover {
                         .img {
                             width: 40px;
                             height: 40px;
+							padding: 6px;
                             margin-right: 0;
                             &>img {
                                 width: 100%;
@@ -2087,6 +2088,16 @@ footer .items ul li a:hover {
                         justify-content: center;
                         padding: 0;
                         border: 0;
+						.noti-badge {
+							background-color: #FF4747;
+							width: 12px;
+							height: 12px;
+							border-radius: 50%;
+							position: absolute;
+							top: 10px;
+							right: 8px;
+							border: solid 2px #232b38;
+						}
                     }
 					&.show {
 						.dropdown-menu {
@@ -2146,6 +2157,7 @@ footer .items ul li a:hover {
 										}
 										display: grid;
 										grid-template-columns: auto auto;
+										justify-content: flex-start;
 										column-gap: 12px;
 										.noti-img {
 											width: 56px;

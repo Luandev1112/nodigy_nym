@@ -8,7 +8,8 @@ import ArrowRightImage from "../assets/images/arrow-right.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ErrorModal from '../elements/ErrorModal';
-import { apiUrl, shortenAddress } from '../utils/script';
+import { shortenAddress } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 
 const WalletInstall = () => {
     const [walletAddress, setWalletAddress] = useState('');

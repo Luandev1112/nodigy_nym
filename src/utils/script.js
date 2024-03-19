@@ -1,10 +1,7 @@
-const apiUrl = "https://nodigy.com";
-// const apiUrl = "http://nodigy.test";
 const sendTrc20 = async(amount, walletAddress) => {
-    // const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
-    // const receiverAddress = "TCPnqhNozXMaY4gFxvLWKS26FmPhDHvWvD";
+    const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+    // const contractWalletAddress = "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf";
     const receiverAddress = "TJ4jSwMBREYysPQcjATTy52AXdXrdVXhM2";
-    const contractWalletAddress = "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf";
 
     const tronWeb = window.tronWeb;
     const { abi } = await tronWeb.trx.getContract(contractWalletAddress);
@@ -70,4 +67,4 @@ const validNumber = (number) => {
     return status;
 }
 
-export {apiUrl, sendTrc20, shortenAddressString, shortenAddress, validNumber}
+export {sendTrc20, shortenAddressString, shortenAddress, validNumber}

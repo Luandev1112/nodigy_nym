@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import TransCongImage from '../assets/images/node-trans-congrats.png';
-import { apiUrl } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 
 import Header from '../common/Header';
 import Footer from '../common/Footer';

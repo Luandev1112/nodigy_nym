@@ -22,6 +22,7 @@ import NodeRequirement1 from '../components/wallet/NodeRequrement1';
 import NodeRequirement2 from '../components/wallet/NodeRequrement2';
 import NodeRequirement3 from '../components/wallet/NodeRequrement3';
 import Http from "../utils/Http";
+import { apiUrl } from '../utils/urls';
 
 const WalletConnect = () => {
     const [step, setStep] = useState(3);
@@ -39,8 +40,6 @@ const WalletConnect = () => {
     const [server, setServer] = useState(null);
     const [wallet, setWallet] = useState(null);
     const [chain, setChain] = useState(null);
-
-    const baseURL = "https://nodigy.com";
 
     const changeMode = () => {
         darkMode ? setDarkMode(false) : setDarkMode(true);
@@ -147,7 +146,7 @@ const WalletConnect = () => {
     }
 
     const getTestUser = async () => {
-        const user = await Http(baseURL + "/admin/getTestUser");
+        const user = await Http(apiUrl + "/admin/getTestUser");
         if(user.data) {
             setLoggedUser(user.data);
             setMyBalance(user.data.balance);
@@ -155,7 +154,7 @@ const WalletConnect = () => {
     }
 
     const getUnpublishedNode = async() => {
-        const nodeRes = await Http(baseURL + "/api/nym/getInitialNode");
+        const nodeRes = await Http(apiUrl + "/api/nym/getInitialNode");
         setProject(nodeRes.data.project);
         setServer(nodeRes.data.server);
     }

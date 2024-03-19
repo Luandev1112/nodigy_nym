@@ -6,7 +6,8 @@ import Footer from '../common/Footer';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
 import CopyImage from '../assets/images/icon-copy.svg';
 import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
-import { apiUrl } from '../utils/script';
+import { shortenAddress } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 const DepositSuccess = () => {
     const { state } = useLocation();
     const [hashId, setHashId] = useState(state?state.hashId:null);
@@ -64,7 +65,7 @@ const DepositSuccess = () => {
                                                 <tbody>
                                                     <tr>
                                                         <td>Payment ID:</td>
-                                                        <td className="text-right"><span className="whitetext">{hashId}</span><a onClick={()=>copyLink(hashId, 'payment_id')}> <img src={copyContent=='payment_id'?CheckCircleImage:CopyImage} /></a></td>
+                                                        <td className="text-right"><span className="whitetext">{shortenAddress(hashId)}</span><a onClick={()=>copyLink(hashId, 'payment_id')}> <img src={copyContent=='payment_id'?CheckCircleImage:CopyImage} /></a></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Amount</td>

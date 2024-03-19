@@ -5,7 +5,8 @@ import CopyImage from "../assets/images/icon-copy.svg";
 import CheckCircleImage from "../assets/images/icon-check-bullet.svg";
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import { apiUrl, shortenAddressString } from "../utils/script";
+import { shortenAddressString } from "../utils/script";
+import { apiUrl } from '../utils/urls';
 
 const ChooseServer = () => {
     const [node, setNode] = useState(0);

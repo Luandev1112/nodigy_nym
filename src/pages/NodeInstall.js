@@ -8,7 +8,8 @@ import Footer from '../common/Footer';
 import NymWallet from '../elements/NymWallet';
 import {CircularProgressbar} from 'react-circular-progressbar';
 import "react-circular-progressbar/dist/styles.css";
-import { apiUrl, shortenAddress } from '../utils/script';
+import { shortenAddress } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 const NodeInstall = () => {
     const [walletAddress, setWalletAddress] = useState("");
     const [balance, setBalance] = useState(0);
@@ -138,7 +139,7 @@ const NodeInstall = () => {
                                             <p className="graytext">{installDescription}</p>
                                         </div>
                                         {node && <NymWallet nodeId={node.id} /> }
-                                        <p className="graytext">The installation process may take up to an hour. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href={apiUrl+"/admin/node/nym"}>personal area.</a></p>
+                                        <p className="graytext">The installation process may take up to an hour. You can close this window. We will notify you when the installation is finished and send you a link to complete the last steps. You can track progress also in your <a href={apiUrl+"/admin/node/NYM"}>personal area.</a></p>
                                     </div>
                                 </div>
                             </div>

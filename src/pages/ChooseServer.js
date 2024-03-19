@@ -8,7 +8,7 @@ import Header from '../common/Header';
 import Footer from '../common/Footer';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorModal from '../elements/ErrorModal';
-import { apiUrl } from '../utils/script';
+import { apiUrl, web3APIUrl } from '../utils/urls';
 
 const ChooseServer = () => {
     const { state } = useLocation();
@@ -82,51 +82,59 @@ const ChooseServer = () => {
             if(balance >= limitBalance){
                 try {
                     setLoadingStatus(true);
-                    let formData = new FormData();
-                    formData.append('server_id', selectedServer.id);
-                    formData.append('price', limitBalance);
-                    const result = await Http.post(apiUrl + '/api/nym/purchase-server', formData);
-    
-                    const userBalance = result.data.user_balance;
-                    setBalance(userBalance);
-                    const hashId = result.data.transaction.txn_id;
-                    
-                    const _nodeId = result.data.node.id;
-                    const _projectId = result.data.node.project_id;
-                    const _locationId = locations[selectedLocationIndex].id;
-                    const _serverType = selectedServer.type;
-                    const _serverTypeId = selectedServer.server_type_id;
-                    
-                    const serverData = new FormData();
-                    serverData.append('project_id', _projectId);
-                    serverData.append('node_id', _nodeId);
-                    serverData.append('location_id', _locationId);
-                    serverData.append('server_type_id', _serverTypeId);
-                    serverData.append('data_center_type', _serverType);
-                    const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
-                    console.log("Create server result", createServerResult);
-    
-                    const _createdServer = createServerResult.data.data.server;
-                    console.log("_created server: ", _createdServer);
-                    if(_createdServer){
-                        const _serverId = _createdServer.id;
-                        console.log("server id",_serverId);
-                        formData = new FormData();
-                        formData.append('server_id', _serverId);
-                        formData.append('node_id', _nodeId);
-                        const saveResult = await Http.post(apiUrl + '/api/nym/save-server-id', formData);
-                        if(saveResult.data){
-                            navigate('/deposit-success', {
-                                state: {
-                                    hashId: hashId,
-                                    balanceType: 'server'
+                    const userResult = await Http.get(apiUrl + "/api/user");
+                    if(userResult.data.success)
+                    {
+                        const token = userResult.data.data.token;
+                        const additionalUrl = 'amount='+limitBalance+'&token='+token;
+                        const purchaseResult = await Http.get(web3APIUrl+'/purchase-server?'+additionalUrl);
+                        if(purchaseResult.data.result == 1) {
+                            let formData = new FormData();
+                            formData.append('transaction_id', purchaseResult.data.transaction.id);
+                            formData.append('price', limitBalance);
+                            const result = await Http.post(apiUrl + '/api/nym/purchase-server', formData);
+            
+                            const userBalance = result.data.user_balance;
+                            setBalance(userBalance);
+                            const hashId = result.data.transaction.txn_id;
+
+                            const _nodeId = result.data.node.id;
+                            const _projectId = result.data.node.project_id;
+                            const _locationId = locations[selectedLocationIndex].id;
+                            const _serverType = selectedServer.type;
+                            const _serverTypeId = selectedServer.server_type_id;
+                            
+                            const serverData = new FormData();
+                            serverData.append('project_id', _projectId);
+                            serverData.append('node_id', _nodeId);
+                            serverData.append('location_id', _locationId);
+                            serverData.append('server_type_id', _serverTypeId);
+                            serverData.append('data_center_type', _serverType);
+                            const createServerResult = await Http.post(apiUrl + '/api/wizard-setting-nym/create-server', serverData);
+                            console.log("Create server result", createServerResult);
+            
+                            const _createdServer = createServerResult.data.data.server;
+                            console.log("_created server: ", _createdServer);
+                            if(_createdServer){
+                                const _serverId = _createdServer.id;
+                                console.log("server id",_serverId);
+                                formData = new FormData();
+                                formData.append('server_id', _serverId);
+                                formData.append('node_id', _nodeId);
+                                const saveResult = await Http.post(apiUrl + '/api/nym/save-server-id', formData);
+                                if(saveResult.data){
+                                    navigate('/deposit-success', {
+                                        state: {
+                                            hashId: hashId,
+                                            balanceType: 'server'
+                                        }
+                                    });
                                 }
-                            });
+                            }
                         }
                     }
-    
                     setLoadingStatus(false);
-                    
+
                 } catch (error) {
                     console.log(error);
                     setLoadingStatus(false);

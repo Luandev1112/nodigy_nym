@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-import { apiUrl } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 const InstallGuide = () => {
     const [balance, setBalance] = useState(0);
     const [step, setStep] = useState(6);

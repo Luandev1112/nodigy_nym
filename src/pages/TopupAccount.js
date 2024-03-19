@@ -7,7 +7,7 @@ import Header from "../common/Header";
 import Footer from "../common/Footer";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { sendTrc20, shortenAddress, validNumber} from "../utils/script";
-import { apiUrl } from "../utils/script";
+import { apiUrl, mediaUrl } from "../utils/urls";
 
 const TopupAccount = () => {
   // card variables
@@ -28,7 +28,6 @@ const TopupAccount = () => {
   const [walletPrice, setWalletPrice] = useState(0);
   const [walletInstalled, setWalletInstalled] = useState(false);
   const [maxToken, setMaxToken] = useState(0);
-  const mediaUrl = "https://static.nodigy.com/";
   const [balance, setBalance] = useState(0);
   const [error, setError] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
@@ -42,8 +41,8 @@ const TopupAccount = () => {
   const commingSoon = true;
 
   // TronLink transaction constant settings
-  // const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
-  const contractWalletAddress = "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf";
+  const contractWalletAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+  // const contractWalletAddress = "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf";
 
   const navigate = useNavigate();
 

@@ -3,33 +3,29 @@ import {useNavigate, useSearchParams, useLocation} from 'react-router-dom';
 import Http from "../utils/Http";
 import { Button, Dropdown, Modal } from 'react-bootstrap';
 import LogoImage from "../assets/images/logo.svg";
-import ProfileImage from "../assets/images/profile-img.png";
+import ProfileImage from "../assets/images/Single-Male.svg";
 import IconSettingsImage from "../assets/images/icon-setings.png";
 import IconEmptyWallet from "../assets/images/icon-empty-wallet.png";
 import IconLogoutImage from "../assets/images/icon-logout.png";
-import IconNotifications from "../assets/images/icon-notifications.png";
+import IconNotifications from "../assets/images/icon-notifications.svg";
 import ProgressBar from './ProgressBar';
-import { apiUrl } from '../utils/script';
-
-import NodeLogo1 from "../assets/images/nodes-logo-icon1.png";
-import NodeLogo2 from "../assets/images/nodes-logo-icon2.png";
-import NodeLogo3 from "../assets/images/nodes-logo-icon3.png";
-
+import { apiUrl } from '../utils/urls';
 import IconDoubleCheckImage from "../assets/images/icon-doublecheck-blue.svg";
-import IconPrevImage from "../assets/images/node-prep-icon1.svg";
 
 const Header = ({setBalance, myBalance, step}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [nodeId, setNodeId] = useState(searchParams.get('nodeId'));
   const [darkMode, setDarkMode] = useState(true);
-  const changeMode = () => {
-      darkMode ? setDarkMode(false) : setDarkMode(true);
-  }
   const [user, setUser] = useState(null);
   const [userBalance, setUserBalance] = useState(0);
+  const [notiData, setNotiData] = useState(null);
+  const [notiCount, setNotiCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("Page Locationn: ", location.pathname);
+  
+  const changeMode = () => {
+    darkMode ? setDarkMode(false) : setDarkMode(true);
+  }
 
   const getApiUser = async() => {
     try{
@@ -39,9 +35,10 @@ const Header = ({setBalance, myBalance, step}) => {
         setUser(res.data.data);
         setUserBalance(res.data.data.balance);
         setBalance(res.data.data.balance);
+        localStorage.setItem('access_token', res.data.data.token);
       }
     }catch(err){
-      window.location.href = apiUrl+"/admin/wallet-connect";
+      window.location.href = apiUrl+"/admin/add-new-node";
     }
   }
 
@@ -122,10 +119,44 @@ const Header = ({setBalance, myBalance, step}) => {
     }  
   }
 
+  const getNotificationData = async()=>{
+    try {
+      const result = await Http.get(apiUrl+'/api/notification?filter_is_read=0');
+      const _notifications = result.data.data.notifications;
+      if(_notifications) {
+        setNotiData(_notifications);
+      }
+    }
+    catch (error) {
+
+    }
+  }
+
+  const setNotificationsRead = async() => {
+    console.log("Notification Read");
+    try {
+      const result = await Http.get(apiUrl+'/api/notification/mark-all-as-read');
+    }
+    catch (error) {
+      console.log("error :", error);
+    }
+  }
+
+  const checkNotifications = async() => {
+    await getNotificationData();
+    setTimeout(()=>{
+      setNotiCount(notiCount + 1);
+    }, 5000);
+  }
+
   useEffect(()=>{
     getApiUser();
     getInitNode();
   }, []);
+
+  useEffect(()=>{
+    checkNotifications();
+  }, [notiCount]);
 
   useEffect(()=>{
     if(myBalance >= 0){
@@ -147,75 +178,42 @@ const Header = ({setBalance, myBalance, step}) => {
             </div>
 
             <Dropdown className="notifications">
-                <Dropdown.Toggle variant="default" id="">
-                    <img src={IconNotifications} />
-                </Dropdown.Toggle>
+              <Dropdown.Toggle variant="default" id="">
+                <img src={IconNotifications} />
+                {notiData && notiData.length > 0 && 
+                  <div className="noti-badge" />
+                }
+              </Dropdown.Toggle>
 
-                <Dropdown.Menu>
+              <Dropdown.Menu>
                 <div className='notifications-header'>
                   <h3>Notifications</h3>
-                  <a role='button'><img src={IconDoubleCheckImage} />Mark all as read</a>
+                  <a role='button' onClick={()=>setNotificationsRead()}><img src={IconDoubleCheckImage} />Mark all as read</a>
                 </div>
                 <div className='notifications-body'>
-                  <li>
-                    <Dropdown.Item>
-                      <div className='noti-img'>
-                        <img src={NodeLogo1} />
-                      </div>
-                      <div className='noti-content'>
-                        <h4 className='noti-title'>
-                          Arbitrum
-                        </h4>
-                        <p className='noti-description'>You have set $200.00 to NODE NAME 1234</p>
-                        <span className='noti-time'>2 min ago</span>
-                      </div>
-                    </Dropdown.Item>
-                  </li>
-                  <li>
-                    <Dropdown.Item>
-                      <div className='noti-img'>
-                        <img src={NodeLogo2} />
-                      </div>
-                      <div className='noti-content'>
-                        <h4 className='noti-title'>
-                          Node installation is in progress
-                        </h4>
-                        <p className='noti-description'>Tellus id interdum velit laoreet id donec. Leo integer malesuada nunc vel risus commodo </p>
-                        <span className='noti-time'>5 min ago</span>
-                      </div>
-                    </Dropdown.Item>
-                  </li>
-                  <li>
-                    <Dropdown.Item>
-                      <div className='noti-img'>
-                        <img src={NodeLogo3} />
-                      </div>
-                      <div className='noti-content'>
-                        <h4 className='noti-title'>
-                          Forta
-                        </h4>
-                        <p className='noti-description'>You have a new payment request from Forta Projects for $800.00 </p>
-                        <span className='noti-time'>1 hour ago</span>
-                      </div>
-                    </Dropdown.Item>
-                  </li>
-                  <li>
-                    <Dropdown.Item>
-                      <div className='noti-img'>
-                        <img src={IconPrevImage} />
-                      </div>
-                      <div className='noti-content'>
-                        <h4 className='noti-title'>
-                          Payment Received
-                        </h4>
-                        <p className='noti-description'>Receive new payment $100 from Creative Uzbeks </p>
-                        <span className='noti-time'>18 hour ago</span>
-                      </div>
-                    </Dropdown.Item>
-                  </li>
+                  {notiData && notiData.length > 0 &&
+                    notiData.map((notification, i)=>{
+                      return (
+                        <li key={i}>
+                          <Dropdown.Item>
+                            <div className='noti-img'>
+                              <img src={notification.image_url} />
+                            </div>
+                            <div className='noti-content'>
+                              <h4 className='noti-title'>
+                                {notification.title}
+                              </h4>
+                              <p className='noti-description' dangerouslySetInnerHTML={{ __html: notification.content }} />
+                              <span className='noti-time'>{notification.date_view}</span>
+                            </div>
+                          </Dropdown.Item>
+                        </li>
+                      )
+                    })
+                  }
                 </div>
                 <div className='notifications-footer'>
-                  <a role='button' href={apiUrl+'/admin/notifications'}>See all notifications</a>
+                  <a role='button' href={apiUrl + '/admin/notifications'}>See all notifications</a>
                 </div>
               </Dropdown.Menu>
             </Dropdown>

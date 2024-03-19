@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import Http from "../../utils/Http";
+import { mediaUrl } from '../utils/urls';
 const WalletList = ({setWalletName, setStep, chooseUserWallet, wallet}) => {
 	const [walletList, setWalletList] = useState([]);
 	const border_arr = ['border-right', 'border-left', 'border-left', 'border-right'];
 	const [status, setStaus] = useState(false);
 	const [selectedId, setSelectedId] = useState(0);
 	const [selectedWalletName, setSelectedWalletName] = useState("");
-
-	const mediaUrl = "https://static.nodigy.com/";
 
 	const gotoWalletInstallation = (walletName) => {
 		setWalletName(walletName);

@@ -5,7 +5,7 @@ import Header from '../common/Header';
 import Footer from '../common/Footer';
 import SuccessImage from '../assets/images/node-trans-congrats.png';
 import ErrorModal from '../elements/ErrorModal';
-import { apiUrl } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 
 const WalletSuccess = () => {
     const [balance, setBalance] = useState(0);

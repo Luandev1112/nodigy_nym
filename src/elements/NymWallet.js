@@ -3,7 +3,8 @@ import NYMImage from '../assets/images/nodes-logo-icon1.png';
 import EditImage from '../assets/images/icon-edit-2.svg';
 import SaveCircleImage from "../assets/images/icon-check-bullet-bluebg.svg";
 import CloseImage from "../assets/images/icon-line-close-black.png";
-import { apiUrl, shortenAddress, shortenAddressString } from '../utils/script';
+import { shortenAddress, shortenAddressString } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 import Http from "../utils/Http";
 
 const NymWallet = ({nodeId}) => {

@@ -4,7 +4,7 @@ import Header from '../common/Header';
 import Footer from '../common/Footer';
 import ProgressBar from '../common/ProgressBar';
 import NymWallet from '../elements/NymWallet';
-import { apiUrl } from '../utils/script';
+import { apiUrl } from '../utils/urls';
 import Http from "../utils/Http";
 const Stake = () => {
     const [searchParams, setSearchParams] = useSearchParams();
